@@ -12,8 +12,15 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define TAILLE_BATEAU_MIN 2
-#define TAILLE_BATEAU_MAX 6
+#define NOMBRE_NAVIRES 6
+#define TAILLE_NAVIRE_MIN 2
+#define TAILLE_NAVIRE_MAX 6
+#define SENS_POSSIBLES 4
+#define TAILLE_PLATEAU_MIN 6
+#define TAILLE_PLATEAU_MAX 120
+#define CASE_NAVIRE 'X'
+#define CASE_VIDE 'O'
+#define CASE_NEUTRE '.'
 
 
 typedef struct une_case {
@@ -98,8 +105,8 @@ void affichage_plateau(int **plateau, int taille_plateau);
 Navire creer_navire( int taille, int taille_plateau ) {
    Navire nouveauNavire;
 
-   nouveauNavire.taille = nb_aleatoire( TAILLE_BATEAU_MAX -1 ) + TAILLE_BATEAU_MIN; 
-   nouveauNavire.sens = nb_aleatoire( 4 );      // Choisit direction entre 0 et 3
+   nouveauNavire.taille = nb_aleatoire( TAILLE_NAVIRE_MAX -1 ) + TAILLE_NAVIRE_MIN; 
+   nouveauNavire.sens = nb_aleatoire( SENS_POSSIBLES );
    nouveauNavire.premiere_case.x = nb_aleatoire( taille_plateau );
    nouveauNavire.premiere_case.y = nb_aleatoire( taille_plateau );
 
