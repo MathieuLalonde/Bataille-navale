@@ -35,26 +35,15 @@ int taille;    // entre 2 à 6 cases
 } Navire;
 
 
-
 /**
  * Initialiser le générateur au début du main par l’instruction suivante
  */
-void init_nb_aleatoire() {
-srandom(time(NULL));
-}
+void init_nb_aleatoire();
 
 /**
  * Renvoie un nombre, tiré au hasard, compris entre 0 et max -1
  */
-int nb_aleatoire(int max) {
-return (random()%max);
-}
-
-
-
-
-
-
+int nb_aleatoire(int max);
 
 /**
  *  Créer un navire d’une taille donnée dont la case de départ et le sens sont fixés aléatoirement. 
@@ -62,10 +51,10 @@ return (random()%max);
 Navire creer_navire(int taille, int taille_plateau);
 
 /**
- *  : Retourne 1 s’il est bien situé dans les limites du plateau, et qu’il ne se
-chevauche pas avec un autre navire, sinon elle retourne 0.
-- plateau est une matrice représentant le plateau de jeu, dans laquelle les cases
-occupées par des navires contiennent un 1 et les autres un 0.
+ * Retourne 1 s’il est bien situé dans les limites du plateau, et qu’il ne se chevauche pas
+ * avec un autre navire, sinon elle retourne 0.
+ * - plateau est une matrice représentant le plateau de jeu, dans laquelle les cases 
+ * occupées par des navires contiennent un 1 et les autres un 0.
 */
 int est_valide(int **plateau, int taille_plateau, struct navire * nav);
 
@@ -96,6 +85,15 @@ void affichage_plateau(int **plateau, int taille_plateau);
 
 
 
+
+
+void init_nb_aleatoire() {
+srandom(time(NULL));
+}
+
+int nb_aleatoire(int max) {
+return (random()%max);
+}
 
 
 
