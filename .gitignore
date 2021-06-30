@@ -1,0 +1,9 @@
+# Fichiers executables
+*.out
+motcache
+
+# Autres fichiers C
+*.o
+
+# Fichers textes (fichiers d'entrée)
+*.txt
