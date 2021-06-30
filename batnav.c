@@ -16,24 +16,28 @@
 
 
 typedef struct une_case {
-int x; /* position de la case en x */
-int y; /* position de la case en y */
+int x;          // position de la case en x
+int y;          // position de la case en y
 } Case;
 
 typedef struct navire {
-int sens; /* 0 haut 1 droite 2 bas 3 gauche */
+int sens;       // 0 haut 1 droite 2 bas 3 gauche
 Case premiere_case;
-int taille;
+int taille;     // entre 2 à 6 cases
 } Navire;
 
 
 
-/* Initialiser le générateur au début du main par l’instruction suivante */
+/**
+ * Initialiser le générateur au début du main par l’instruction suivante
+ */
 void init_nb_aleatoire() {
 srandom(time(NULL));
 }
 
-/* Renvoie un nombre, tiré au hasard, compris entre 1 et max */
+/**
+ * Renvoie un nombre, tiré au hasard, compris entre 1 et max
+ */
 int nb_aleatoire(int max) {
 return (random()%max);
 }
@@ -90,13 +94,18 @@ void affichage_plateau(int **plateau, int taille_plateau);
 
 
 
-Navire créer_navire(int taille, int taille_plateau) {
+Navire créer_navire( int taille, int taille_plateau ) {
     Navire nouveauNavire;
+
+    nouveauNavire.taille = nb_aleatoire( 5 ) + 1;     // Choisit taille entre 2 et 6
+    nouveauNavire.sens = nb_aleatoire( 4 ) -1;    // Choisit direction entre 0 et 3
+    nouveauNavire.premiere_case.x = nb_aleatoire( taille_plateau );
+    nouveauNavire.premiere_case.y = nb_aleatoire( taille_plateau );
 
     return nouveauNavire;
 }
 
-int est_valide(int **plateau, int taille_plateau, struct navire * nav) {
+int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
     int estValide;
 
     return estValide;
