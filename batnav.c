@@ -104,7 +104,6 @@ int choisirTaillePlateau(){
       scanf("%s", entree); // aussi verifier pour chars dans le texte
       
       taille = atoi(entree);
-
    } while ( taille < TAILLE_PLATEAU_MIN || taille > TAILLE_PLATEAU_MAX );
 
    return taille;
@@ -145,7 +144,11 @@ int main( int argc, char** argv ) {
 
    int taille_plateau = choisirTaillePlateau();
 
-   printf("%d\n", taille_plateau);
+   int **plateau = calloc (sizeof(int), taille_plateau * taille_plateau);
 
+   initialisation_plateau(plateau, taille_plateau);
+
+
+   free(plateau);
    return 0;
 }
