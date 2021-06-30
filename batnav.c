@@ -13,6 +13,8 @@
 #include <time.h>
 
 
+
+
 typedef struct une_case {
 int x; /* position de la case en x */
 int y; /* position de la case en y */
@@ -78,7 +80,38 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
  * 
  * 
  */
-void affichage_plateau(int **plateau, int taille_plateau)
+void affichage_plateau(int **plateau, int taille_plateau);
+
+
+
+
+
+
+
+
+
+Navire créer_navire(int taille, int taille_plateau) {
+    Navire nouveauNavire;
+
+    return nouveauNavire;
+}
+
+int est_valide(int **plateau, int taille_plateau, struct navire * nav) {
+    int estValide;
+
+    return estValide;
+}
+
+void initialisation_plateau(int **plateau, int taille_plateau) {
+}
+
+
+void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, int *nbToucheNav, int taille_plateau) {
+}
+
+
+void affichage_plateau(int **plateau, int taille_plateau) {
+}
 
 
 
