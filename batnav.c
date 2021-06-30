@@ -46,6 +46,11 @@ void init_nb_aleatoire();
 int nb_aleatoire(int max);
 
 /**
+ *  Initialise aléatoirement six navires de taille 2 à 6 dans le plateau.
+ */
+void initialisation_plateau(int **plateau, int taille_plateau);
+
+/**
  *  Créer un navire d’une taille donnée dont la case de départ et le sens sont fixés aléatoirement. 
  */
 Navire creer_navire(int taille, int taille_plateau);
@@ -57,11 +62,6 @@ Navire creer_navire(int taille, int taille_plateau);
  * occupées par des navires contiennent un 1 et les autres un 0.
 */
 int est_valide(int **plateau, int taille_plateau, struct navire * nav);
-
-/**
- *  Initialise aléatoirement six navires de taille 2 à 6 dans le plateau.
- */
-void initialisation_plateau(int **plateau, int taille_plateau);
 
 /**
  * Demande à l’utilisateur de saisir une case (x,y) à jouer et selon la valeur contenue plateau[x][y]
@@ -95,10 +95,24 @@ int nb_aleatoire(int max) {
 return (random()%max);
 }
 
+int choisirTaillePlateau(){
+   int taille = 0;
 
+   do {
+      char entree[3]; // remplacer par valeur dynamique et debugger
+      printf( "Veuillez entrer la taille du tableau de jeu (%d-%d) :\n", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
+      scanf("%s", entree); // aussi verifier pour chars dans le texte
+      
+      taille = atoi(entree);
 
+   } while ( taille < TAILLE_PLATEAU_MIN || taille > TAILLE_PLATEAU_MAX );
 
+   return taille;
+}
 
+void initialisation_plateau(int **plateau, int taille_plateau) {
+
+}
 
 Navire creer_navire( int taille, int taille_plateau ) {
    Navire nouveauNavire;
@@ -117,25 +131,21 @@ int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
    return estValide;
 }
 
-void initialisation_plateau(int **plateau, int taille_plateau) {
-}
-
-
 void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, int *nbToucheNav, int taille_plateau) {
-}
 
+}
 
 void affichage_plateau(int **plateau, int taille_plateau) {
+
 }
-
-
 
 
 int main( int argc, char** argv ) {
    init_nb_aleatoire();
 
-   printf("%d\n", nb_aleatoire(4));
+   int taille_plateau = choisirTaillePlateau();
 
+   printf("%d\n", taille_plateau);
 
    return 0;
 }
