@@ -1,6 +1,6 @@
 # Fichiers executables
 *.out
-motcache
+batnav
 
 # Autres fichiers C
 *.o
