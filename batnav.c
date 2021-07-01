@@ -61,7 +61,7 @@ Navire creer_navire(int taille, int taille_plateau);
  * - plateau est une matrice représentant le plateau de jeu, dans laquelle les cases 
  * occupées par des navires contiennent un 1 et les autres un 0.
 */
-int est_valide(int **plateau, int taille_plateau, struct navire * nav);
+int est_valide(int **plateau, int taille_plateau, struct navire *nav);
 
 /**
  * Demande à l’utilisateur de saisir une case (x,y) à jouer et selon la valeur contenue plateau[x][y]
@@ -69,11 +69,11 @@ enregistre dans prop[x][y] la valeur :
 - 0 si la case ne contient pas de navire
 - -1 si la case a déjà été jouée
 - 1 si la case contient un navire
+
 - nbJoue est le compteur du nombre de coups
 - nbTouche est le compteur de cases touchées
-- nbToucheNav est un tableau qui contient le nombre de cases touchées pour chaque
-navire. nbToucheNav[i] indique le nombre de cases touchées pour le navire de
-taille i. 
+- nbToucheNav est un tableau qui contient le nombre de cases touchées pour chaque navire. 
+nbToucheNav[i] indique le nombre de cases touchées pour le navire de taille i. 
 */
 void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, int *nbToucheNav, int taille_plateau);
 
@@ -111,12 +111,21 @@ int choisirTaillePlateau(){
 
 void initialisation_plateau(int **plateau, int taille_plateau) {
 
+
+   for(int i = 0; i < 6; i++ ){
+      int taille = nb_aleatoire( TAILLE_NAVIRE_MAX -1 ) + TAILLE_NAVIRE_MIN;
+
+      Navire nouveauNavire = creer_navire(taille, taille_plateau);
+      if (!est_valide( plateau, taille_plateau, &nouveauNavire ) ){
+         i++;
+      }
+   }
 }
 
 Navire creer_navire( int taille, int taille_plateau ) {
    Navire nouveauNavire;
 
-   nouveauNavire.taille = nb_aleatoire( TAILLE_NAVIRE_MAX -1 ) + TAILLE_NAVIRE_MIN; 
+   nouveauNavire.taille = taille;
    nouveauNavire.sens = nb_aleatoire( SENS_POSSIBLES );
    nouveauNavire.premiere_case.x = nb_aleatoire( taille_plateau );
    nouveauNavire.premiere_case.y = nb_aleatoire( taille_plateau );
@@ -140,13 +149,24 @@ void affichage_plateau(int **plateau, int taille_plateau) {
 
 
 int main( int argc, char** argv ) {
+   int nbTouche = 0;
+   int nbJoue = 0;
+   int nbToucheNav[NOMBRE_NAVIRES];
+
    init_nb_aleatoire();
 
    int taille_plateau = choisirTaillePlateau();
 
    int **plateau = calloc (sizeof(int), taille_plateau * taille_plateau);
+   int **prop = calloc (sizeof(int), taille_plateau * taille_plateau);
 
    initialisation_plateau(plateau, taille_plateau);
+
+   while( nbTouche < 20 ){       // remplacer par une valeur plus concrète...
+      proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
+      affichage_plateau(plateau, taille_plateau);
+   }
+
 
 
    free(plateau);
