@@ -100,13 +100,13 @@ int choisirTaillePlateau(){
 
    do {
       char entree[3]; // remplacer par valeur dynamique et debugger
-      printf( "Veuillez entrer la taille du tableau de jeu (%d-%d) :\n", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
+      printf( "Veuillez entrer la taille du tableau de jeu (%d-%d) : ", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
       scanf("%s", entree); // aussi verifier pour chars dans le texte
       
       taille_plateau = atoi(entree);
    } while ( taille_plateau < TAILLE_PLATEAU_MIN || taille_plateau > TAILLE_PLATEAU_MAX );
 
-   printf( "Vous avez choisis un tableau de jeu de %d x %d.\n", taille_plateau, taille_plateau);
+   printf( "Vous avez choisis un tableau de jeu de %d x %d.\n\n", taille_plateau, taille_plateau);
 
    return taille_plateau;
 }
@@ -146,7 +146,7 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
    do {
       char x[3]; // remplacer par valeur dynamique et debugger
       char y[3]; // remplacer par valeur dynamique et debugger
-      printf( "Veuillez entrer les coordonnées (%d-%d) :\n", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
+      printf( "Veuillez entrer les coordonnées (%d-%d) : ", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
       scanf("%s-%s", x, y); // aussi verifier pour chars dans le texte
       
       // valider les coordonnés....
@@ -166,6 +166,8 @@ int main( int argc, char** argv ) {
    int nbToucheNav[NOMBRE_NAVIRES];
 
    init_nb_aleatoire();
+
+   printf( "\nBienvenue au jeu de bataille navale!\n\n");
 
    int taille_plateau = choisirTaillePlateau();
 
