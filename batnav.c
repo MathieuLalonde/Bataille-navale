@@ -141,6 +141,16 @@ int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
 
 void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, int *nbToucheNav, int taille_plateau) {
 
+   do {
+      char x[3]; // remplacer par valeur dynamique et debugger
+      char y[3]; // remplacer par valeur dynamique et debugger
+      printf( "Veuillez entrer les coordonnées (%d-%d) :\n", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
+      scanf("%s-%s", x, y); // aussi verifier pour chars dans le texte
+      
+      // valider les coordonnés....
+   } while ( 0 ); // ...
+
+   nbJoue = nbJoue++;
 }
 
 void affichage_plateau(int **plateau, int taille_plateau) {
@@ -166,8 +176,6 @@ int main( int argc, char** argv ) {
       proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
       affichage_plateau(plateau, taille_plateau);
    }
-
-
 
    free(plateau);
    return 0;
