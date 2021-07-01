@@ -36,7 +36,7 @@ int taille;    // entre 2 à 6 cases
 
 
 /**
- * Initialiser le générateur au début du main par l’instruction suivante
+ * Initialiser le générateur
  */
 void init_nb_aleatoire();
 
@@ -46,12 +46,12 @@ void init_nb_aleatoire();
 int nb_aleatoire(int max);
 
 /**
- *  Initialise aléatoirement six navires de taille 2 à 6 dans le plateau.
+ * Initialise aléatoirement six navires de taille 2 à 6 dans le plateau.
  */
 void initialisation_plateau(int **plateau, int taille_plateau);
 
 /**
- *  Créer un navire d’une taille donnée dont la case de départ et le sens sont fixés aléatoirement. 
+ * Créer un navire d’une taille donnée dont la case de départ et le sens sont fixés aléatoirement. 
  */
 Navire creer_navire(int taille, int taille_plateau);
 
@@ -64,8 +64,8 @@ Navire creer_navire(int taille, int taille_plateau);
 int est_valide(int **plateau, int taille_plateau, struct navire *nav);
 
 /**
- * Demande à l’utilisateur de saisir une case (x,y) à jouer et selon la valeur contenue plateau[x][y]
-enregistre dans prop[x][y] la valeur :
+ * Demande à l’utilisateur de saisir une case (x,y) à jouer et selon la valeur contenue plateau[x][y] 
+ * enregistre dans prop[x][y] la valeur :
 - 0 si la case ne contient pas de navire
 - -1 si la case a déjà été jouée
 - 1 si la case contient un navire
@@ -96,23 +96,25 @@ return (random()%max);
 }
 
 int choisirTaillePlateau(){
-   int taille = 0;
+   int taille_plateau = 0;
 
    do {
       char entree[3]; // remplacer par valeur dynamique et debugger
       printf( "Veuillez entrer la taille du tableau de jeu (%d-%d) :\n", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
       scanf("%s", entree); // aussi verifier pour chars dans le texte
       
-      taille = atoi(entree);
-   } while ( taille < TAILLE_PLATEAU_MIN || taille > TAILLE_PLATEAU_MAX );
+      taille_plateau = atoi(entree);
+   } while ( taille_plateau < TAILLE_PLATEAU_MIN || taille_plateau > TAILLE_PLATEAU_MAX );
 
-   return taille;
+   printf( "Vous avez choisis un tableau de jeu de %d x %d.\n", taille_plateau, taille_plateau);
+
+   return taille_plateau;
 }
 
 void initialisation_plateau(int **plateau, int taille_plateau) {
 
 
-   for(int i = 0; i < 6; i++ ){
+   for(int i = 0; i < NOMBRE_NAVIRES; i++ ){
       int taille = nb_aleatoire( TAILLE_NAVIRE_MAX -1 ) + TAILLE_NAVIRE_MIN;
 
       Navire nouveauNavire = creer_navire(taille, taille_plateau);
@@ -150,7 +152,7 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
       // valider les coordonnés....
    } while ( 0 ); // ...
 
-   nbJoue = nbJoue++;
+   nbJoue++;
 }
 
 void affichage_plateau(int **plateau, int taille_plateau) {
