@@ -17,7 +17,7 @@
 #define TAILLE_NAVIRE_MAX 6
 #define SENS_POSSIBLES 4
 #define TAILLE_PLATEAU_MIN 6
-#define TAILLE_PLATEAU_MAX 120
+#define TAILLE_PLATEAU_MAX 50
 #define CASE_NAVIRE 'X'
 #define CASE_VIDE 'O'
 #define CASE_NEUTRE '.'
@@ -116,7 +116,7 @@ int choisirTaillePlateau(){
       taille_plateau = atoi(entree);
    } while ( taille_plateau < TAILLE_PLATEAU_MIN || taille_plateau > TAILLE_PLATEAU_MAX );
 
-   printf( "Vous avez choisis un tableau de jeu de %d x %d.\n\n", taille_plateau, taille_plateau);
+   printf( "Vous avez choisi un tableau de jeu de %d x %d.\n\n", taille_plateau, taille_plateau);
 
    return taille_plateau;
 }
@@ -181,7 +181,15 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
 }
 
 void affichage_plateau(int **plateau, int taille_plateau) {
-
+   for ( int i = 0; i < taille_plateau; i++ ){
+      for ( int j = 0; j < taille_plateau; j++ ){
+         if (plateau[i][j] == 0 ){
+            printf( "  %c", CASE_NEUTRE );
+         } else printf( "  %c", CASE_NAVIRE );
+      }
+      printf("\n");
+   }
+   printf("\n");
 }
 
 
@@ -202,6 +210,8 @@ int main( int argc, char** argv ) {
    prop = creerMatrice( taille_plateau, 0 );
 
    initialisation_plateau(plateau, taille_plateau);
+
+   affichage_plateau(plateau, taille_plateau);
 
    while( nbTouche < 20 ){       // remplacer par une valeur plus concrète...
       proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
