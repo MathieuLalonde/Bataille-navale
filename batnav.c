@@ -161,9 +161,31 @@ Navire creer_navire( int taille, int taille_plateau ) {
 }
 
 int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
-   int estValide = 0;
+   Case sens;
+   if ( nav->sens == 0 ) {       
+      sens.y = -1;
+   } else if ( nav->sens == 1 ) {
+      sens.x = 1;
+   } else if ( nav->sens == 2 ) {
+      sens.y = 1;
+   } else if ( nav->sens == 3 ) {
+      sens.x = -1;
+   } else return 0;
 
-   return estValide;
+   Case derniereCase;
+   derniereCase.x = nav->premiere_case.x + ( nav->taille * sens.x );
+   derniereCase.y = nav->premiere_case.y + ( nav->taille * sens.y );
+
+   if (derniereCase.x > taille_plateau || derniereCase.x < 0 || derniereCase.y > taille_plateau || derniereCase.y > 0) {
+      return 0;
+   }
+
+   for ( int i = 0; i < nav->taille; i++){
+      if (plateau[nav->premiere_case.x + ( i * sens.x )][nav->premiere_case.y + ( i * sens.y )] != 0 ) {
+         return 0;
+      }
+   }
+   return 1;
 }
 
 void ajouteNavire(nouveauNavire, plateau);
