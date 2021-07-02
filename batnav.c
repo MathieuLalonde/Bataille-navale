@@ -137,13 +137,13 @@ int** creerMatrice(int taille_plateau, int valeur_initiale) {
 }
 
 void initialisation_plateau(int **plateau, int taille_plateau) {
-
-
-   for(int i = 0; i < NOMBRE_NAVIRES; i++ ){
+   int i = 0;
+   while( i < NOMBRE_NAVIRES) {           // attention aux boucles infinies!
       int taille = nb_aleatoire( TAILLE_NAVIRE_MAX -1 ) + TAILLE_NAVIRE_MIN;
 
       Navire nouveauNavire = creer_navire(taille, taille_plateau);
-      if (!est_valide( plateau, taille_plateau, &nouveauNavire ) ){
+      if (est_valide( plateau, taille_plateau, &nouveauNavire ) ){
+         ajouteNavire(nouveauNavire, plateau);
          i++;
       }
    }
@@ -165,6 +165,8 @@ int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
 
    return estValide;
 }
+
+void ajouteNavire(nouveauNavire, plateau);
 
 void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, int *nbToucheNav, int taille_plateau) {
 
