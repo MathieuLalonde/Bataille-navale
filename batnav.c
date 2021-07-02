@@ -46,6 +46,16 @@ void init_nb_aleatoire();
 int nb_aleatoire(int max);
 
 /**
+ * 
+ */
+int choisirTaillePlateau();
+
+/**
+ * 
+ */
+int** creerMatrice( int taille_plateau, int valeur_initiale);
+
+/**
  * Initialise aléatoirement six navires de taille 2 à 6 dans le plateau.
  */
 void initialisation_plateau(int **plateau, int taille_plateau);
@@ -111,6 +121,21 @@ int choisirTaillePlateau(){
    return taille_plateau;
 }
 
+int** creerMatrice(int taille_plateau, int valeur_initiale) {
+   int **matrice = calloc( sizeof( int* ), taille_plateau );   // mettre +1 ici si besoin d'identifier la fin
+
+   for ( int i = 0; i < taille_plateau; i++ ){
+         matrice[i] = calloc ( sizeof( int ), taille_plateau );
+   }
+
+   for ( int i = 0; i < taille_plateau; i++ ){
+      for ( int j = 0; j < taille_plateau; j++ ){
+         matrice[i][j] = valeur_initiale;
+      }
+   }
+   return matrice;
+}
+
 void initialisation_plateau(int **plateau, int taille_plateau) {
 
 
@@ -164,6 +189,8 @@ int main( int argc, char** argv ) {
    int nbTouche = 0;
    int nbJoue = 0;
    int nbToucheNav[NOMBRE_NAVIRES];
+   int **plateau;
+   int **prop;
 
    init_nb_aleatoire();
 
@@ -171,8 +198,8 @@ int main( int argc, char** argv ) {
 
    int taille_plateau = choisirTaillePlateau();
 
-   int **plateau = calloc (sizeof(int), taille_plateau * taille_plateau);
-   int **prop = calloc (sizeof(int), taille_plateau * taille_plateau);
+   plateau = creerMatrice( taille_plateau, 0 );
+   prop = creerMatrice( taille_plateau, 0 );
 
    initialisation_plateau(plateau, taille_plateau);
 
