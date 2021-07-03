@@ -74,6 +74,16 @@ Navire creer_navire(int taille, int taille_plateau);
 int est_valide(int **plateau, int taille_plateau, struct navire *nav);
 
 /**
+ * 
+ */
+Case sens2D( int sens );
+
+/**
+ * 
+ */
+void ajouteNavire( Navire nav, int **plateau );
+
+/**
  * Demande à l’utilisateur de saisir une case (x,y) à jouer et selon la valeur contenue plateau[x][y] 
  * enregistre dans prop[x][y] la valeur :
 - 0 si la case ne contient pas de navire
@@ -161,34 +171,47 @@ Navire creer_navire( int taille, int taille_plateau ) {
 }
 
 int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
-   Case sens;
-   if ( nav->sens == 0 ) {       
-      sens.y = -1;
-   } else if ( nav->sens == 1 ) {
-      sens.x = 1;
-   } else if ( nav->sens == 2 ) {
-      sens.y = 1;
-   } else if ( nav->sens == 3 ) {
-      sens.x = -1;
-   } else return 0;
-
+   Case sens = sens2D( nav->sens );
    Case derniereCase;
    derniereCase.x = nav->premiere_case.x + ( nav->taille * sens.x );
    derniereCase.y = nav->premiere_case.y + ( nav->taille * sens.y );
 
-   if (derniereCase.x > taille_plateau || derniereCase.x < 0 || derniereCase.y > taille_plateau || derniereCase.y > 0) {
-      return 0;
-   }
-
-   for ( int i = 0; i < nav->taille; i++){
-      if (plateau[nav->premiere_case.x + ( i * sens.x )][nav->premiere_case.y + ( i * sens.y )] != 0 ) {
-         return 0;
+   if (derniereCase.x < taille_plateau && derniereCase.x >= 0 
+        && derniereCase.y < taille_plateau && derniereCase.y >= 0) {
+      for ( int i = 0; i < nav->taille; i++){
+         if (plateau[nav->premiere_case.x + ( i * sens.x )][nav->premiere_case.y + ( i * sens.y )] != 0 ) {
+            return 0;
+         }
       }
    }
    return 1;
 }
 
-void ajouteNavire(nouveauNavire, plateau);
+Case sens2D( int sens ){
+   Case sens2D;
+   sens2D.x = 0;
+   sens2D.y = 0;
+
+   if ( sens == 0 ) {       
+      sens2D.y = -1;
+   } else if ( sens == 1 ) {
+      sens2D.x = 1;
+   } else if ( sens == 2 ) {
+      sens2D.y = 1;
+   } else if ( sens == 3 ) {
+      sens2D.x = -1;
+   }
+
+   return sens2D;
+}
+
+void ajouteNavire( Navire nav, int **plateau ) {
+   Case sens = sens2D( nav.sens );
+
+   for ( int i = 0; i < nav.taille; i++){
+      plateau[nav.premiere_case.x + ( i * sens.x )][nav.premiere_case.y + ( i * sens.y )] = 1;
+   }
+}
 
 void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, int *nbToucheNav, int taille_plateau) {
 
@@ -205,9 +228,9 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
 }
 
 void affichage_plateau(int **plateau, int taille_plateau) {
-   for ( int i = 0; i < taille_plateau; i++ ){
-      for ( int j = 0; j < taille_plateau; j++ ){
-         if (plateau[i][j] == 0 ){
+   for ( int y = 0; y < taille_plateau; y++ ){
+      for ( int x = 0; x < taille_plateau; x++ ){
+         if (plateau[x][y] == 0 ){
             printf( "  %c", CASE_NEUTRE );
          } else printf( "  %c", CASE_NAVIRE );
       }
