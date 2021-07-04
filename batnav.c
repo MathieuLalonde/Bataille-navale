@@ -3,7 +3,7 @@
  *
  * @author Mathieu Lalonde
  * @code_permanent LALM14127501
- * @date 2021/06/30
+ * @date 2021/07/04
  *
  * Jeu de bataille navale.
  */
@@ -76,7 +76,7 @@ int est_valide(int **plateau, int taille_plateau, struct navire *nav);
 /**
  * 
  */
-Case sens2D( int sens );
+Case convertitSens( int sens );
 
 /**
  * 
@@ -171,7 +171,7 @@ Navire creer_navire( int taille, int taille_plateau ) {
 }
 
 int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
-   Case sens = sens2D( nav->sens );
+   Case sens = convertitSens( nav->sens );
    Case derniereCase;
    derniereCase.x = nav->premiere_case.x + ( nav->taille * sens.x );
    derniereCase.y = nav->premiere_case.y + ( nav->taille * sens.y );
@@ -187,7 +187,7 @@ int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
    return 1;
 }
 
-Case sens2D( int sens ){
+Case convertitSens( int sens ){
    Case sens2D;
    sens2D.x = 0;
    sens2D.y = 0;
@@ -201,12 +201,11 @@ Case sens2D( int sens ){
    } else if ( sens == 3 ) {
       sens2D.x = -1;
    }
-
    return sens2D;
 }
 
 void ajouteNavire( Navire nav, int **plateau ) {
-   Case sens = sens2D( nav.sens );
+   Case sens = convertitSens( nav.sens );
 
    for ( int i = 0; i < nav.taille; i++){
       plateau[nav.premiere_case.x + ( i * sens.x )][nav.premiere_case.y + ( i * sens.y )] = 1;
