@@ -105,11 +105,15 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
 
 /**
  * 
- * 
+ * Affiche le plateau (pour fins de debugage)
  */
 void affichage_plateau(int **plateau, int taille_plateau);
 
-
+/**
+ * 
+ * 
+ */
+void affichage_grille(int **prop, int taille_plateau);
 
 
 
@@ -285,6 +289,22 @@ void affichage_plateau(int **plateau, int taille_plateau) {
    printf("\n");
 }
 
+void affichage_grille(int **prop, int taille_plateau) {
+   for ( int y = 0; y < taille_plateau; y++ ){
+      for ( int x = 0; x < taille_plateau; x++ ){
+         if (prop[x][y] == -1 ){
+            printf( "  %c", CASE_NEUTRE );
+         } else if (prop[x][y] == 0 ) {
+            printf( "  %c", CASE_VIDE );
+         } else printf( "  %c", CASE_NAVIRE );
+      }
+      printf("\n");
+   }
+   printf("\n");
+}
+
+
+
 
 int main( int argc, char** argv ) {
    int nbTouche = 0;
@@ -304,11 +324,12 @@ int main( int argc, char** argv ) {
 
    initialisation_plateau(plateau, taille_plateau);
 
-   affichage_plateau(plateau, taille_plateau);
+   affichage_grille(prop, taille_plateau);
 
    while( nbTouche < 20 ){       // remplacer par une valeur plus concrète...
       proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
-      affichage_plateau(plateau, taille_plateau);
+      //affichage_plateau(plateau, taille_plateau);
+      affichage_grille(prop, taille_plateau);
    }
 
    free(plateau);
