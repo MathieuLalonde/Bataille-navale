@@ -79,6 +79,11 @@ int est_valide(int **plateau, int taille_plateau, struct navire *nav);
 Case convertitSens( int sens );
 
 /**
+ *  Calcule jusqu'où va se rendra le navire
+ */
+Case calculeDerniereCase( struct navire *nav );
+
+/**
  * 
  */
 void ajouteNavire( Navire nav, int **plateau );
@@ -172,18 +177,20 @@ Navire creer_navire( int taille, int taille_plateau ) {
 
 int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
    Case sens = convertitSens( nav->sens );
-   Case derniereCase;
-   derniereCase.x = nav->premiere_case.x + ( nav->taille * sens.x );
-   derniereCase.y = nav->premiere_case.y + ( nav->taille * sens.y );
+   Case derniereCase = calculeDerniereCase(nav);
 
-   if (derniereCase.x < taille_plateau && derniereCase.x >= 0 
-        && derniereCase.y < taille_plateau && derniereCase.y >= 0) {
-      for ( int i = 0; i < nav->taille; i++){
-         if (plateau[nav->premiere_case.x + ( i * sens.x )][nav->premiere_case.y + ( i * sens.y )] != 0 ) {
-            return 0;
-         }
+   // Vérifie si le navire sort du plateau
+   if (derniereCase.x >= taille_plateau || derniereCase.x < 0 
+         || derniereCase.y >= taille_plateau || derniereCase.y < 0) {
+      return 0;
+   }
+   // Vérifie si la place du navire est déjà occupée
+   for ( int i = 0; i < nav->taille; i++){
+      if (plateau[nav->premiere_case.x + ( i * sens.x )][nav->premiere_case.y + ( i * sens.y )] != 0 ) {
+         return 0;
       }
    }
+
    return 1;
 }
 
@@ -202,6 +209,15 @@ Case convertitSens( int sens ){
       sens2D.x = -1;
    }
    return sens2D;
+}
+
+Case calculeDerniereCase( struct navire *nav ){
+   Case sens = convertitSens( nav->sens );
+   Case derniereCase;
+   derniereCase.x = nav->premiere_case.x + ( nav->taille * sens.x );
+   derniereCase.y = nav->premiere_case.y + ( nav->taille * sens.y );
+
+   return derniereCase;
 }
 
 void ajouteNavire( Navire nav, int **plateau ) {
