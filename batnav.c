@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #define NOMBRE_NAVIRES 6
@@ -181,7 +182,7 @@ int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
 
    // Vérifie si le navire sort du plateau
    if (derniereCase.x >= taille_plateau || derniereCase.x < 0 
-         || derniereCase.y >= taille_plateau || derniereCase.y < 0) {
+         || derniereCase.y >= taille_plateau || derniereCase.y < 0) { // refactpr
       return 0;
    }
    // Vérifie si la place du navire est déjà occupée
@@ -229,15 +230,45 @@ void ajouteNavire( Navire nav, int **plateau ) {
 }
 
 void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, int *nbToucheNav, int taille_plateau) {
+   Case proposition;
+   int propValide;
 
    do {
-      char x[3]; // remplacer par valeur dynamique et debugger
-      char y[3]; // remplacer par valeur dynamique et debugger
-      printf( "Veuillez entrer les coordonnées (%d-%d) : ", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
-      scanf("%s-%s", x, y); // aussi verifier pour chars dans le texte
+      propValide = 1;
+
+      char entree[10];
+      printf( "Veuillez entrer les coordonnées X-Y (de 0 à %d) : ", TAILLE_PLATEAU_MAX );
+      scanf( " %9[^\n]", entree ); // aussi verifier pour chars dans le texte
       
-      // valider les coordonnés....
-   } while ( 0 ); // ...
+      char *entreeX = strtok(entree, " -,.:");
+      char *entreeY = strtok(NULL, " -,.:");
+
+      /* if ( strtok(NULL, "") != NULL ) {
+         continue;
+      } */
+
+      // valider les coordonnés.... !!
+
+      proposition.x = atoi(entreeX);
+      proposition.y = atoi(entreeY);
+      
+      if ( proposition.x >= taille_plateau || proposition.x < 0 
+         || proposition.y >= taille_plateau || proposition.y < 0 ) {  //refactor
+            printf ("Coordonnés invalides, veuillez réessayer...\n");
+            propValide = 0;
+         } 
+
+   } while ( propValide == 0 );
+
+   if ( prop[proposition.x][proposition.y] == -1 ){
+      if ( plateau[proposition.x][proposition.y] == 0) {
+         prop[proposition.x][proposition.y] = 0;
+         printf("À l'eau !\n");
+      } else {
+         prop[proposition.x][proposition.y] = 1;
+         printf("Touché !\n");
+      }
+   } else printf("Déjà joué !\n");
 
    nbJoue++;
 }
@@ -269,7 +300,7 @@ int main( int argc, char** argv ) {
    int taille_plateau = choisirTaillePlateau();
 
    plateau = creerMatrice( taille_plateau, 0 );
-   prop = creerMatrice( taille_plateau, 0 );
+   prop = creerMatrice( taille_plateau, -1 );
 
    initialisation_plateau(plateau, taille_plateau);
 
