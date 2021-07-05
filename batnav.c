@@ -274,6 +274,7 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
       } else {
          prop[proposition.x][proposition.y] = 1;
          printf("Touché !\n");
+            *nbTouche += 1;
             if ( --nbToucheNav[plateau[proposition.x][proposition.y]] == 0 ){
                int taille = plateau[proposition.x][proposition.y];
                if (taille < TAILLE_NAVIRE_MIN ) {
@@ -283,8 +284,7 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
             }
       }
    } else printf("Déjà joué !\n");
-
-   nbJoue++;
+   *nbJoue += 1;
 }
 
 void affichage_plateau(int **plateau, int taille_plateau) {
@@ -351,10 +351,14 @@ int main( int argc, char** argv ) {
       proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
       // affichage_plateau(plateau, taille_plateau);
       affichage_grille(prop, taille_plateau);
+      
+      printf("Nombre touché : %d sur 26\n", nbTouche);
+      printf("Nombre de coups : %d \n", nbJoue);
    }
 
    printf( "\nFélicitations, vous avez coulé les %d navires en %d coups !\n\n", NOMBRE_NAVIRES, nbJoue);
 
-   free(plateau);
+   free(plateau); // libérer la mémoire !!!
+   free(prop);
    return 0;
 }
