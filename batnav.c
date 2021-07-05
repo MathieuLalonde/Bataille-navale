@@ -300,7 +300,13 @@ void affichage_plateau(int **plateau, int taille_plateau) {
 }
 
 void affichage_grille(int **prop, int taille_plateau) {
+      printf("   ");
+   for ( int x = 0; x < taille_plateau; x++ ){
+      printf( "%3d", x );
+   }
+   printf("\n");
    for ( int y = 0; y < taille_plateau; y++ ){
+      printf( "%3d", y );
       for ( int x = 0; x < taille_plateau; x++ ){
          if (prop[x][y] == -1 ){
             printf( "  %c", CASE_NEUTRE );
@@ -323,6 +329,8 @@ int main( int argc, char** argv ) {
    int **plateau;
    int **prop;
 
+   init_nb_aleatoire();
+
    for ( int i = 1; i <= NOMBRE_NAVIRES; i++ ){  // énoncé demande de compter l'inverse...
       nbToucheNav[i] = i;
       if ( i < TAILLE_NAVIRE_MIN ){
@@ -330,26 +338,22 @@ int main( int argc, char** argv ) {
       }
    }
 
-   init_nb_aleatoire();
-
    printf( "\nBienvenue au jeu de bataille navale!\n\n");
 
    int taille_plateau = choisirTaillePlateau();
-
    plateau = creerMatrice( taille_plateau, 0 );
    prop = creerMatrice( taille_plateau, -1 );
-
    initialisation_plateau(plateau, taille_plateau);
 
    affichage_grille(prop, taille_plateau);
 
    while( nbTouche < 26 ){       // remplacer par une valeur plus concrète...
       proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
-      affichage_plateau(plateau, taille_plateau);
+      // affichage_plateau(plateau, taille_plateau);
       affichage_grille(prop, taille_plateau);
    }
 
-   printf( "\nFélicitations, vous avez coulé les %d navires en %d coups!\n\n", NOMBRE_NAVIRES, nbJoue);
+   printf( "\nFélicitations, vous avez coulé les %d navires en %d coups !\n\n", NOMBRE_NAVIRES, nbJoue);
 
    free(plateau);
    return 0;
