@@ -3,11 +3,12 @@
  *
  * @author Mathieu Lalonde
  * @code_permanent LALM14127501
- * @date 2021/07/04
+ * @date 2021/07/05
  *
  * Jeu de bataille navale.
  */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -102,6 +103,11 @@ void ajouteNavire( Navire nav, int **plateau, int numeroNavire );
 nbToucheNav[i] indique le nombre de cases touchées pour le navire de taille i. 
 */
 void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, int *nbToucheNav, int taille_plateau);
+
+/**
+ * 
+ */
+int estNumerique( char *chaine );
 
 /**
  * 
@@ -243,29 +249,31 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
    do {
       propValide = 1;
 
-      char entree[10];
+      char entree[20];
       printf( "Veuillez entrer les coordonnées X-Y (de 0 à %d) : ", TAILLE_PLATEAU_MAX );
-      scanf( " %9[^\n]", entree ); // aussi verifier pour chars dans le texte
-      
+      scanf( " %s19[^\n]", entree ); // aussi verifier pour chars dans le texte
+
       char *entreeX = strtok(entree, " -,.:");
-      char *entreeY = strtok(NULL, " -,.:");
+      char *entreeY = strtok(NULL, "");
 
-      /* if ( strtok(NULL, "") != NULL ) {
-         continue;
-      } */
-
-      // valider les coordonnés.... !!
-
-      proposition.x = atoi(entreeX);
-      proposition.y = atoi(entreeY);
-      
-      if ( proposition.x >= taille_plateau || proposition.x < 0 
-         || proposition.y >= taille_plateau || proposition.y < 0 ) {  //refactor !
-            printf ("Coordonnés invalides, veuillez réessayer...\n");
+      if ( strcmp( entreeX, "s" ) == 0 || strcmp( entreeX, "S" ) == 0 ){
+         printf("Sauvegarde de la partie (fonction à venir)");
+      } else if ( estNumerique( entreeX ) && estNumerique( entreeY ) )  {
+         proposition.x = atoi(entreeX);
+         proposition.y = atoi(entreeY);
+         
+         if ( proposition.x >= taille_plateau || proposition.x < 0 
+                  || proposition.y >= taille_plateau || proposition.y < 0 ) {  //refactor !
+            printf ("Coordonnés invalides, veuillez réessayer de nouveau.\n\n");
             propValide = 0;               // p.s. valider qu'il y a deux veleurs! 
          } 
+      } else {
+         printf("Entrée invalide, veuillez esayer de nouveau.\n\n");
+         propValide = 0; 
+      } 
 
    } while ( propValide == 0 );
+
 
    if ( prop[proposition.x][proposition.y] == -1 ){
       if ( plateau[proposition.x][proposition.y] == 0) {
@@ -285,6 +293,20 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
       }
    } else printf("Déjà joué !\n");
    *nbJoue += 1;
+}
+
+int estNumerique( char *chaine ) {
+   if ( chaine == NULL ) {
+      return 0;
+   }
+
+   for ( int i = 0; chaine[i] != '\0'; i++ )
+   {
+      if ( isdigit( chaine[i] ) == 0 )
+            return 0;
+   }
+
+    return 1;
 }
 
 void affichage_plateau(int **plateau, int taille_plateau) {
