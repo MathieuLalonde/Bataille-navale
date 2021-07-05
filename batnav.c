@@ -276,7 +276,7 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
          printf("Touché !\n");
             if ( --nbToucheNav[plateau[proposition.x][proposition.y]] == 0 ){
                int taille = plateau[proposition.x][proposition.y];
-               if (taille > TAILLE_NAVIRE_MAX ) {
+               if (taille < TAILLE_NAVIRE_MIN ) {
                   taille = TAILLE_NAVIRE_MAX;   
                }
                   printf("Vous avez coulé un navire de taille %d !\n", taille );
