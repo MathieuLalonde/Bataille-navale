@@ -112,6 +112,11 @@ Case entrerProposition(int taille_plateau);
 /**
  * 
  */
+int valideProposition( char *entreeX, char *entreeY, int taille_plateau, Case *proposition);
+
+/**
+ * 
+ */
 int estNumerique( char *chaine );
 
 /**
@@ -287,7 +292,6 @@ Case entrerProposition(int taille_plateau) {
    int propValide;
 
    do {
-      propValide = 1;
       char entree[20];
       printf( "Veuillez entrer les coordonnées X-Y (de 0 à %d) : ", TAILLE_PLATEAU_MAX );
       scanf( " %s19[^\n]", entree ); // aussi verifier pour chars dans le texte
@@ -296,24 +300,31 @@ Case entrerProposition(int taille_plateau) {
       char *entreeY = strtok(NULL, "");
 
       if ( strcmp( entreeX, "s" ) == 0 || strcmp( entreeX, "S" ) == 0 ){
-         printf("Sauvegarde de la partie (fonction à venir)");
-      } else if ( estNumerique( entreeX ) && estNumerique( entreeY ) )  {
-         proposition.x = atoi(entreeX);
-         proposition.y = atoi(entreeY);
-         
-         if ( proposition.x >= taille_plateau || proposition.x < 0 
-                  || proposition.y >= taille_plateau || proposition.y < 0 ) {  //refactor !
-            printf ("Coordonnés invalides, veuillez réessayer de nouveau.\n\n");
-            propValide = 0;               // p.s. valider qu'il y a deux veleurs! 
-         } 
-      } else {
-         printf("Entrée invalide, veuillez esayer de nouveau.\n\n");
-         propValide = 0; 
-      } 
+         printf("Sauvegarde de la partie (fonction à venir)\n\n");
+      } else propValide = valideProposition(entreeX, entreeY, taille_plateau, &proposition);
    } while ( propValide == 0 );
+
    return proposition;
 }
 
+
+int valideProposition( char *entreeX, char *entreeY, int taille_plateau, Case *proposition) {
+   int estValide = 0;
+
+   if ( estNumerique( entreeX ) && estNumerique( entreeY ) )  {
+      proposition->x = atoi(entreeX);
+      proposition->y = atoi(entreeY);
+      
+      if ( proposition->x >= taille_plateau || proposition->x < 0 
+               || proposition->y >= taille_plateau || proposition->y < 0 ) {  //refactor !
+         printf ("Coordonnés invalides, veuillez réessayer de nouveau.\n\n");
+      } else estValide = 1;
+
+   } else {
+      printf("Entrée invalide, veuillez esayer de nouveau.\n\n");
+   }
+   return estValide;
+}
 
 int estNumerique( char *chaine ) {
    if ( chaine == NULL ) {
@@ -397,7 +408,7 @@ int main( int argc, char** argv ) {
 
    affichage_grille(prop, taille_plateau);
 
-   while( nbTouche < 2 ){       // remplacer par une valeur plus concrète...
+   while( nbTouche < 26 ){       // remplacer par une valeur plus concrète...
       proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
       // affichage_plateau(plateau, taille_plateau);
       affichage_grille(prop, taille_plateau);
