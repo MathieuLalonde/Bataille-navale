@@ -17,7 +17,7 @@
 #define TAILLE_NAVIRE_MIN 2
 #define TAILLE_NAVIRE_MAX 6
 #define SENS_POSSIBLES 4
-#define TAILLE_PLATEAU_MIN 6
+#define TAILLE_PLATEAU_MIN 7
 #define TAILLE_PLATEAU_MAX 50
 #define CASE_NAVIRE 'X'
 #define CASE_VIDE 'O'
@@ -87,7 +87,7 @@ Case calculeDerniereCase( struct navire *nav );
 /**
  * 
  */
-void ajouteNavire( Navire nav, int **plateau );
+void ajouteNavire( Navire nav, int **plateau, int numeroNavire );
 
 /**
  * Demande à l’utilisateur de saisir une case (x,y) à jouer et selon la valeur contenue plateau[x][y] 
@@ -129,9 +129,9 @@ int choisirTaillePlateau(){
    int taille_plateau = 0;
 
    do {
-      char entree[3]; // remplacer par valeur dynamique et debugger
+      char entree[5]; // remplacer par valeur dynamique et debugger
       printf( "Veuillez entrer la taille du tableau de jeu (%d-%d) : ", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
-      scanf("%s", entree); // aussi verifier pour chars dans le texte
+      scanf(" %4[^\n]", entree); // aussi verifier pour chars dans le texte
       
       taille_plateau = atoi(entree);
    } while ( taille_plateau < TAILLE_PLATEAU_MIN || taille_plateau > TAILLE_PLATEAU_MAX );
@@ -157,13 +157,16 @@ int** creerMatrice(int taille_plateau, int valeur_initiale) {
 }
 
 void initialisation_plateau(int **plateau, int taille_plateau) {
-   int i = 0;
-   while( i < NOMBRE_NAVIRES) {           // attention aux boucles infinies!
-      int taille = nb_aleatoire( TAILLE_NAVIRE_MAX -1 ) + TAILLE_NAVIRE_MIN;
+   int i = 1;
+   while( i <= NOMBRE_NAVIRES) {
+      int taille = i;
+      if ( i < TAILLE_NAVIRE_MIN ){
+         taille = TAILLE_NAVIRE_MAX;
+      }
 
       Navire nouveauNavire = creer_navire(taille, taille_plateau);
       if (est_valide( plateau, taille_plateau, &nouveauNavire ) ){
-         ajouteNavire(nouveauNavire, plateau);
+         ajouteNavire(nouveauNavire, plateau, i);
          i++;
       }
    }
@@ -225,11 +228,11 @@ Case calculeDerniereCase( struct navire *nav ){
    return derniereCase;
 }
 
-void ajouteNavire( Navire nav, int **plateau ) {
+void ajouteNavire( Navire nav, int **plateau, int numeroNavire ) {
    Case sens = convertitSens( nav.sens );
 
    for ( int i = 0; i < nav.taille; i++){
-      plateau[nav.premiere_case.x + ( i * sens.x )][nav.premiere_case.y + ( i * sens.y )] = 1;
+      plateau[nav.premiere_case.x + ( i * sens.x )][nav.premiere_case.y + ( i * sens.y )] = numeroNavire;
    }
 }
 
@@ -257,9 +260,9 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
       proposition.y = atoi(entreeY);
       
       if ( proposition.x >= taille_plateau || proposition.x < 0 
-         || proposition.y >= taille_plateau || proposition.y < 0 ) {  //refactor
+         || proposition.y >= taille_plateau || proposition.y < 0 ) {  //refactor !
             printf ("Coordonnés invalides, veuillez réessayer...\n");
-            propValide = 0;
+            propValide = 0;               // p.s. valider qu'il y a deux veleurs! 
          } 
 
    } while ( propValide == 0 );
@@ -271,6 +274,13 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
       } else {
          prop[proposition.x][proposition.y] = 1;
          printf("Touché !\n");
+            if ( --nbToucheNav[plateau[proposition.x][proposition.y]] == 0 ){
+               int taille = plateau[proposition.x][proposition.y];
+               if (taille > TAILLE_NAVIRE_MAX ) {
+                  taille = TAILLE_NAVIRE_MAX;   
+               }
+                  printf("Vous avez coulé un navire de taille %d !\n", taille );
+            }
       }
    } else printf("Déjà joué !\n");
 
@@ -282,7 +292,7 @@ void affichage_plateau(int **plateau, int taille_plateau) {
       for ( int x = 0; x < taille_plateau; x++ ){
          if (plateau[x][y] == 0 ){
             printf( "  %c", CASE_NEUTRE );
-         } else printf( "  %c", CASE_NAVIRE );
+         } else printf( "  %d", plateau[x][y]);
       }
       printf("\n");
    }
@@ -313,6 +323,13 @@ int main( int argc, char** argv ) {
    int **plateau;
    int **prop;
 
+   for ( int i = 1; i <= NOMBRE_NAVIRES; i++ ){  // énoncé demande de compter l'inverse...
+      nbToucheNav[i] = i;
+      if ( i < TAILLE_NAVIRE_MIN ){
+         nbToucheNav[i] = TAILLE_NAVIRE_MAX;
+      }
+   }
+
    init_nb_aleatoire();
 
    printf( "\nBienvenue au jeu de bataille navale!\n\n");
@@ -326,9 +343,9 @@ int main( int argc, char** argv ) {
 
    affichage_grille(prop, taille_plateau);
 
-   while( nbTouche < 20 ){       // remplacer par une valeur plus concrète...
+   while( nbTouche < 26 ){       // remplacer par une valeur plus concrète...
       proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
-      //affichage_plateau(plateau, taille_plateau);
+      affichage_plateau(plateau, taille_plateau);
       affichage_grille(prop, taille_plateau);
    }
 
