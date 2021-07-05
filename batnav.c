@@ -349,6 +349,8 @@ int main( int argc, char** argv ) {
       affichage_grille(prop, taille_plateau);
    }
 
+   printf( "\nFélicitations, vous avez coulé les %d navires en %d coups!\n\n", NOMBRE_NAVIRES, nbJoue);
+
    free(plateau);
    return 0;
 }
