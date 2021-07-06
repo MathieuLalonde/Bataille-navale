@@ -64,12 +64,12 @@ int** creerMatrice( int taille_plateau, int valeur_initiale);
 /**
  * Initialise aléatoirement six navires de taille 2 à 6 dans le plateau.
  */
-void initialisation_plateau(int **plateau, int taille_plateau);
+void initialisation_plateau( int **plateau, int taille_plateau, int *nbToucheNav );
 
 /**
  * Créer un navire d’une taille donnée dont la case de départ et le sens sont fixés aléatoirement. 
  */
-Navire creer_navire(int taille, int taille_plateau);
+Navire creer_navire(int taille_plateau);
 
 /**
  * 
@@ -187,27 +187,24 @@ int** creerMatrice(int taille_plateau, int valeur_initiale) {
 }
 
 
-void initialisation_plateau(int **plateau, int taille_plateau) {
-   int i = 1;
-   while( i <= NOMBRE_NAVIRES) {
-      int taille = i;
-      if ( i < TAILLE_NAVIRE_MIN ){
-         taille = TAILLE_NAVIRE_MAX;
-      }
+void initialisation_plateau( int **plateau, int taille_plateau, int *nbToucheNav ) {
+   int i = 0;
 
-      Navire nouveauNavire = creer_navire(taille, taille_plateau);
+   while( i < NOMBRE_NAVIRES) {
+      Navire nouveauNavire = creer_navire(taille_plateau);
       if (est_valide( plateau, taille_plateau, &nouveauNavire ) ){
          ajouteNavire(nouveauNavire, plateau, i);
+         nbToucheNav[i] = nouveauNavire.taille;
          i++;
       }
    }
 }
 
 
-Navire creer_navire( int taille, int taille_plateau ) {
+Navire creer_navire(int taille_plateau ) {
    Navire nouveauNavire;
 
-   nouveauNavire.taille = taille;
+   nouveauNavire.taille = nb_aleatoire( TAILLE_NAVIRE_MAX - TAILLE_NAVIRE_MIN + 1 ) + TAILLE_NAVIRE_MIN;
    nouveauNavire.sens = sens_aleatoire();
    nouveauNavire.premiere_case.x = nb_aleatoire( taille_plateau );
    nouveauNavire.premiere_case.y = nb_aleatoire( taille_plateau );
@@ -397,25 +394,18 @@ void libererMatrice(int **matrice, int taille_plateau) {
 int main( int argc, char** argv ) {
    int nbTouche = 0;
    int nbJoue = 0;
-   int nbToucheNav[NOMBRE_NAVIRES + 1];
+   int nbToucheNav[NOMBRE_NAVIRES];
    int **plateau;
    int **prop;
 
    init_nb_aleatoire();
-   
-   for ( int i = 1; i <= NOMBRE_NAVIRES; i++ ){  // énoncé demande de compter l'inverse...
-      nbToucheNav[i] = i;
-      if ( i < TAILLE_NAVIRE_MIN ){
-         nbToucheNav[i] = TAILLE_NAVIRE_MAX;
-      }
-   }
-   
+      
    printf( "\nBienvenue au jeu de bataille navale!\n\n");
 
    int taille_plateau = choisirTaillePlateau();
    plateau = creerMatrice( taille_plateau, 0 );
    prop = creerMatrice( taille_plateau, -1 );
-   initialisation_plateau(plateau, taille_plateau);
+   initialisation_plateau(plateau, taille_plateau, nbToucheNav);
 
    affichage_grille(prop, taille_plateau);
 
