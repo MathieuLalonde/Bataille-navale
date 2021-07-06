@@ -3,7 +3,7 @@
  *
  * @author Mathieu Lalonde
  * @code_permanent LALM14127501
- * @date 2021/07/05
+ * @date 2021/07/06
  *
  * Jeu de bataille navale.
  */
@@ -17,7 +17,6 @@
 #define NOMBRE_NAVIRES 6
 #define TAILLE_NAVIRE_MIN 2
 #define TAILLE_NAVIRE_MAX 6
-#define SENS_POSSIBLES 4
 #define TAILLE_PLATEAU_MIN 7
 #define TAILLE_PLATEAU_MAX 50
 #define CASE_NAVIRE 'X'
@@ -30,8 +29,13 @@ int x;         // position de la case en x
 int y;         // position de la case en y
 } Case;
 
+typedef struct sens {
+   int x;
+   int y;
+} Sens;
+
 typedef struct navire {
-int sens;      // 0 haut 1 droite 2 bas 3 gauche
+Sens sens;   
 Case premiere_case;
 int taille;    // entre 2 à 6 cases
 } Navire;
@@ -68,6 +72,11 @@ void initialisation_plateau(int **plateau, int taille_plateau);
 Navire creer_navire(int taille, int taille_plateau);
 
 /**
+ * 
+ */
+Sens sens_aleatoire();
+
+/**
  * Retourne 1 s’il est bien situé dans les limites du plateau, et qu’il ne se chevauche pas
  * avec un autre navire, sinon elle retourne 0.
  * - plateau est une matrice représentant le plateau de jeu, dans laquelle les cases 
@@ -75,22 +84,16 @@ Navire creer_navire(int taille, int taille_plateau);
 */
 int est_valide(int **plateau, int taille_plateau, struct navire *nav);
 
-/**
- * 
- */
-Case convertitSens( int sens );
 
 /**
  *  Calcule jusqu'où va se rendra le navire
  */
 Case calculeDerniereCase( struct navire *nav );
 
-
 /**
  * 
  */
 int estCaseSurLePlateau ( Case caseAValider, int taille_plateau );
-
 
 /**
  * 
@@ -119,7 +122,7 @@ Case entrerProposition(int taille_plateau);
 /**
  * 
  */
-int valideProposition( char *entreeX, char *entreeY, int taille_plateau, Case *proposition);
+int estPropositionValide( char *entreeX, char *entreeY, int taille_plateau, Case *proposition);
 
 /**
  * 
@@ -205,7 +208,7 @@ Navire creer_navire( int taille, int taille_plateau ) {
    Navire nouveauNavire;
 
    nouveauNavire.taille = taille;
-   nouveauNavire.sens = nb_aleatoire( SENS_POSSIBLES );
+   nouveauNavire.sens = sens_aleatoire();
    nouveauNavire.premiere_case.x = nb_aleatoire( taille_plateau );
    nouveauNavire.premiere_case.y = nb_aleatoire( taille_plateau );
 
@@ -213,8 +216,25 @@ Navire creer_navire( int taille, int taille_plateau ) {
 }
 
 
+Sens sens_aleatoire() {
+   Sens sens;
+   sens.x = 0;
+   sens.y = 0;
+   
+   if ( nb_aleatoire( 2 ) ) {       
+      if ( nb_aleatoire( 2 ) ) {
+         sens.x = 1;
+      } else sens.x = -1;
+
+   } else if ( nb_aleatoire( 2 ) ) {
+         sens.y = 1;
+      } else sens.y = -1;
+      
+   return sens;
+}
+
+
 int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
-   Case sens = convertitSens( nav->sens );
    Case derniereCase = calculeDerniereCase(nav);
 
    // Vérifie si le navire sort du plateau
@@ -223,7 +243,7 @@ int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
    }
    // Vérifie si la place du navire est déjà occupée
    for ( int i = 0; i < nav->taille; i++){
-      if (plateau[nav->premiere_case.x + ( i * sens.x )][nav->premiere_case.y + ( i * sens.y )] != 0 ) {
+      if (plateau[nav->premiere_case.x + ( i * nav->sens.x )][nav->premiere_case.y + ( i * nav->sens.y )] != 0 ) {
          return 0;
       }
    }
@@ -232,30 +252,10 @@ int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
 }
 
 
-Case convertitSens( int sens ){
-   Case sens2D;
-   sens2D.x = 0;
-   sens2D.y = 0;
-
-   if ( sens == 0 ) {       
-      sens2D.y = -1;
-   } else if ( sens == 1 ) {
-      sens2D.x = 1;
-   } else if ( sens == 2 ) {
-      sens2D.y = 1;
-   } else if ( sens == 3 ) {
-      sens2D.x = -1;
-   }
-   return sens2D;
-}
-
-
 Case calculeDerniereCase( struct navire *nav ){
-   Case sens = convertitSens( nav->sens );
    Case derniereCase;
-   derniereCase.x = nav->premiere_case.x + ( nav->taille * sens.x );
-   derniereCase.y = nav->premiere_case.y + ( nav->taille * sens.y );
-
+   derniereCase.x = nav->premiere_case.x + ( nav->taille * nav->sens.x );
+   derniereCase.y = nav->premiere_case.y + ( nav->taille * nav->sens.y );
    return derniereCase;
 }
 
@@ -269,10 +269,8 @@ int estCaseSurLePlateau ( Case caseAValider, int taille_plateau ) {
 
 
 void ajouteNavire( Navire nav, int **plateau, int numeroNavire ) {
-   Case sens = convertitSens( nav.sens );
-
    for ( int i = 0; i < nav.taille; i++){
-      plateau[nav.premiere_case.x + ( i * sens.x )][nav.premiere_case.y + ( i * sens.y )] = numeroNavire;
+      plateau[nav.premiere_case.x + ( i * nav.sens.x )][nav.premiere_case.y + ( i * nav.sens.y )] = numeroNavire;
    }
 }
 
@@ -315,7 +313,7 @@ Case entrerProposition(int taille_plateau) {
 
       if ( strcmp( entreeX, "s" ) == 0 || strcmp( entreeX, "S" ) == 0 ){
          printf("Sauvegarde de la partie (fonction à venir)\n\n");
-      } else propValide = valideProposition(entreeX, entreeY, taille_plateau, &proposition);
+      } else propValide = estPropositionValide(entreeX, entreeY, taille_plateau, &proposition);
    } while ( propValide == 0 );
 
    return proposition;
