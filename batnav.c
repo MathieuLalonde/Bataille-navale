@@ -85,6 +85,13 @@ Case convertitSens( int sens );
  */
 Case calculeDerniereCase( struct navire *nav );
 
+
+/**
+ * 
+ */
+int estCaseSurLePlateau ( Case caseAValider, int taille_plateau );
+
+
 /**
  * 
  */
@@ -211,8 +218,7 @@ int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
    Case derniereCase = calculeDerniereCase(nav);
 
    // Vérifie si le navire sort du plateau
-   if (derniereCase.x >= taille_plateau || derniereCase.x < 0 
-         || derniereCase.y >= taille_plateau || derniereCase.y < 0) { // refactpr
+   if ( !estCaseSurLePlateau ( derniereCase, taille_plateau ) ) {
       return 0;
    }
    // Vérifie si la place du navire est déjà occupée
@@ -251,6 +257,14 @@ Case calculeDerniereCase( struct navire *nav ){
    derniereCase.y = nav->premiere_case.y + ( nav->taille * sens.y );
 
    return derniereCase;
+}
+
+
+int estCaseSurLePlateau ( Case caseAValider, int taille_plateau ) {
+   if ( caseAValider.x >= taille_plateau || caseAValider.x < 0 
+            || caseAValider.y >= taille_plateau || caseAValider.y < 0) {
+      return 0;
+   } else return 1;
 }
 
 
@@ -315,8 +329,7 @@ int valideProposition( char *entreeX, char *entreeY, int taille_plateau, Case *p
       proposition->x = atoi(entreeX);
       proposition->y = atoi(entreeY);
       
-      if ( proposition->x >= taille_plateau || proposition->x < 0 
-               || proposition->y >= taille_plateau || proposition->y < 0 ) {  //refactor !
+   if ( !estCaseSurLePlateau ( *proposition, taille_plateau )) {
          printf ("Coordonnés invalides, veuillez réessayer de nouveau.\n\n");
       } else estValide = 1;
 
