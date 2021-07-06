@@ -322,7 +322,7 @@ Case entrerProposition(int taille_plateau) {
 }
 
 
-int valideProposition( char *entreeX, char *entreeY, int taille_plateau, Case *proposition) {
+int estPropositionValide( char *entreeX, char *entreeY, int taille_plateau, Case *proposition) {
    int estValide = 0;
 
    if ( estNumerique( entreeX ) && estNumerique( entreeY ) )  {
