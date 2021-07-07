@@ -19,10 +19,16 @@
 #define TAILLE_NAVIRE_MAX 6
 #define TAILLE_PLATEAU_MIN 6
 #define TAILLE_PLATEAU_MAX 50
-#define CASE_NAVIRE 'X'
-#define CASE_VIDE 'O'
-#define CASE_NEUTRE '.'
 
+#ifndef DELUXE
+#  define CASE_NAVIRE "X"
+#  define CASE_VIDE "O"
+#  define CASE_NEUTRE "."
+#else 
+#  define CASE_NAVIRE "\033[0;31mX\033[0m"
+#  define CASE_VIDE "\033[0;34mO\033[0m"
+#  define CASE_NEUTRE "\033[0;34m.\033[0m"
+#endif
 
 typedef struct une_case {
 int x;         // position de la case en x
@@ -138,7 +144,7 @@ int estNumerique( char *chaine );
  * 
  * Affiche le plateau (pour fins de debugage)
  */
-void affichage_plateau(int **plateau, int taille_plateau);
+void affichage_plateau(int **plateau, int taille_plateau, int **prop);
 
 /**
  * 
@@ -362,12 +368,22 @@ int estNumerique( char *chaine ) {
 }
 
 
-void affichage_plateau(int **plateau, int taille_plateau) {
+void affichage_plateau(int **plateau, int taille_plateau, int **prop) {
+         printf("   ");
+   for ( int x = 0; x < taille_plateau; x++ ){
+      printf( "%3d", x );
+   }
+   printf("\n");
    for ( int y = 0; y < taille_plateau; y++ ){
+      printf( "%3d", y );
       for ( int x = 0; x < taille_plateau; x++ ){
-         if (plateau[x][y] == 0 ){
-            printf( "  %c", CASE_NEUTRE );
-         } else printf( "  %d", plateau[x][y]);
+         if (prop[x][y] == -1 ){
+            if (plateau[x][y] == 0 ){
+               printf( "  %s", CASE_NEUTRE );
+            } else printf( "  %d", plateau[x][y]);
+         } else if (prop[x][y] == 0 ) {
+            printf( "  %s", CASE_VIDE );
+         } else printf( "  %s", CASE_NAVIRE );
       }
       printf("\n");
    }
@@ -385,10 +401,10 @@ void affichage_grille(int **prop, int taille_plateau) {
       printf( "%3d", y );
       for ( int x = 0; x < taille_plateau; x++ ){
          if (prop[x][y] == -1 ){
-            printf( "  %c", CASE_NEUTRE );
+            printf( "  %s", CASE_NEUTRE );
          } else if (prop[x][y] == 0 ) {
-            printf( "  %c", CASE_VIDE );
-         } else printf( "  %c", CASE_NAVIRE );
+            printf( "  %s", CASE_VIDE );
+         } else printf( "  %s", CASE_NAVIRE );
       }
       printf("\n");
    }
@@ -422,7 +438,8 @@ int main( int argc, char** argv ) {
 
    while( nbTouche < nbTotalCasesNav ){       // remplacer par une valeur plus concrète...
       proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
-      affichage_plateau(plateau, taille_plateau);
+
+      //affichage_plateau(plateau, taille_plateau, prop);
       affichage_grille(prop, taille_plateau);
       
       printf("Nombre touché : %d sur %d\n", nbTouche, nbTotalCasesNav);
