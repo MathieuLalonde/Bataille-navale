@@ -3,7 +3,7 @@
  *
  * @author Mathieu Lalonde
  * @code_permanent LALM14127501
- * @date 2021/07/06
+ * @date 2021/07/07
  *
  * Jeu de bataille navale.
  */
@@ -17,7 +17,7 @@
 #define NOMBRE_NAVIRES 6
 #define TAILLE_NAVIRE_MIN 2
 #define TAILLE_NAVIRE_MAX 6
-#define TAILLE_PLATEAU_MIN 7
+#define TAILLE_PLATEAU_MIN 6
 #define TAILLE_PLATEAU_MAX 50
 #define CASE_NAVIRE 'X'
 #define CASE_VIDE 'O'
@@ -30,8 +30,8 @@ int y;         // position de la case en y
 } Case;
 
 typedef struct sens {
-   int x;
-   int y;
+int x;
+int y;
 } Sens;
 
 typedef struct navire {
@@ -39,6 +39,11 @@ Sens sens;
 Case premiere_case;
 int taille;    // entre 2 à 6 cases
 } Navire;
+
+typedef struct cases_navire {
+int restant;
+int total;
+} Cases_nav;
 
 
 /**
@@ -64,7 +69,7 @@ int** creerMatrice( int taille_plateau, int valeur_initiale);
 /**
  * Initialise aléatoirement six navires de taille 2 à 6 dans le plateau.
  */
-void initialisation_plateau( int **plateau, int taille_plateau, int *nbToucheNav );
+void initialisation_plateau( int **plateau, int taille_plateau, Cases_nav *nbToucheNav );
 
 /**
  * Créer un navire d’une taille donnée dont la case de départ et le sens sont fixés aléatoirement. 
@@ -112,7 +117,7 @@ void ajouteNavire( Navire nav, int **plateau, int numeroNavire );
 - nbToucheNav est un tableau qui contient le nombre de cases touchées pour chaque navire. 
 nbToucheNav[i] indique le nombre de cases touchées pour le navire de taille i. 
 */
-void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, int *nbToucheNav, int taille_plateau);
+void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_nav *nbToucheNav, int taille_plateau);
 
 /**
  * 
@@ -187,14 +192,15 @@ int** creerMatrice(int taille_plateau, int valeur_initiale) {
 }
 
 
-void initialisation_plateau( int **plateau, int taille_plateau, int *nbToucheNav ) {
-   int i = 0;
+void initialisation_plateau( int **plateau, int taille_plateau, Cases_nav *nbToucheNav ) {
+   int i = 1;
 
-   while( i < NOMBRE_NAVIRES) {
+   while( i <= NOMBRE_NAVIRES) {
       Navire nouveauNavire = creer_navire(taille_plateau);
       if (est_valide( plateau, taille_plateau, &nouveauNavire ) ){
          ajouteNavire(nouveauNavire, plateau, i);
-         nbToucheNav[i] = nouveauNavire.taille;
+         nbToucheNav[i].total = nouveauNavire.taille;
+         nbToucheNav[i].restant = nouveauNavire.taille;
          i++;
       }
    }
@@ -272,7 +278,17 @@ void ajouteNavire( Navire nav, int **plateau, int numeroNavire ) {
 }
 
 
-void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, int *nbToucheNav, int taille_plateau) {
+int compteCasesTotalesNavires( Cases_nav *nbToucheNav ) {
+   int total = 0;
+   for ( int i = 1; i <= NOMBRE_NAVIRES; i++ ) {
+      total += nbToucheNav[i].total;
+   }
+
+   return total;
+}
+
+
+void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_nav *nbToucheNav, int taille_plateau) {
    Case entree = entrerProposition(taille_plateau);
 
    if ( prop[entree.x][entree.y] == -1 ){
@@ -283,12 +299,9 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, i
          prop[entree.x][entree.y] = 1;
          printf("Touché !\n");
             *nbTouche += 1;
-            if ( --nbToucheNav[plateau[entree.x][entree.y]] == 0 ){
-               int taille = plateau[entree.x][entree.y];
-               if (taille < TAILLE_NAVIRE_MIN ) {
-                  taille = TAILLE_NAVIRE_MAX;   
-               }
-                  printf("Vous avez coulé un navire de taille %d !\n", taille );
+            if ( --nbToucheNav[plateau[entree.x][entree.y]].restant == 0 ){
+               int taille_originale = nbToucheNav[plateau[entree.x][entree.y]].total;
+               printf("Vous avez coulé un navire de taille %d !\n", taille_originale );
             }
       }
    } else printf("Déjà joué !\n");
@@ -394,27 +407,25 @@ void libererMatrice(int **matrice, int taille_plateau) {
 int main( int argc, char** argv ) {
    int nbTouche = 0;
    int nbJoue = 0;
-   int nbToucheNav[NOMBRE_NAVIRES];
-   int **plateau;
-   int **prop;
-
-   init_nb_aleatoire();
+   Cases_nav nbToucheNav[NOMBRE_NAVIRES + 1];
       
    printf( "\nBienvenue au jeu de bataille navale!\n\n");
 
+   init_nb_aleatoire();
    int taille_plateau = choisirTaillePlateau();
-   plateau = creerMatrice( taille_plateau, 0 );
-   prop = creerMatrice( taille_plateau, -1 );
-   initialisation_plateau(plateau, taille_plateau, nbToucheNav);
+   int **plateau = creerMatrice( taille_plateau, 0 );
+   int **prop = creerMatrice( taille_plateau, -1 );
+   initialisation_plateau( plateau, taille_plateau, nbToucheNav );
+   int nbTotalCasesNav = compteCasesTotalesNavires(nbToucheNav);
 
    affichage_grille(prop, taille_plateau);
 
-   while( nbTouche < 26 ){       // remplacer par une valeur plus concrète...
+   while( nbTouche < nbTotalCasesNav ){       // remplacer par une valeur plus concrète...
       proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
-      // affichage_plateau(plateau, taille_plateau);
+      affichage_plateau(plateau, taille_plateau);
       affichage_grille(prop, taille_plateau);
       
-      printf("Nombre touché : %d sur 26\n", nbTouche);
+      printf("Nombre touché : %d sur %d\n", nbTouche, nbTotalCasesNav);
       printf("Nombre de coups : %d \n", nbJoue);
    }
 
