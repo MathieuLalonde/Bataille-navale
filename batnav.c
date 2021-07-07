@@ -123,12 +123,13 @@ void ajouteNavire( Navire nav, int **plateau, int numeroNavire );
 - nbToucheNav est un tableau qui contient le nombre de cases touchées pour chaque navire. 
 nbToucheNav[i] indique le nombre de cases touchées pour le navire de taille i. 
 */
-void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_nav *nbToucheNav, int taille_plateau);
+void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, 
+         Cases_nav *nbToucheNav, int taille_plateau, int *radar);
 
 /**
  * 
  */
-Case entrerProposition(int taille_plateau);
+Case entrerProposition(int taille_plateau, int *radar);
 
 /**
  * 
@@ -294,20 +295,21 @@ int compteCasesTotalesNavires( Cases_nav *nbToucheNav ) {
 }
 
 
-void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_nav *nbToucheNav, int taille_plateau) {
-   Case entree = entrerProposition(taille_plateau);
+void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, 
+         Cases_nav *nbToucheNav, int taille_plateau, int *radar) {
+   Case entree = entrerProposition(taille_plateau, radar);
 
    if ( prop[entree.x][entree.y] == -1 ){
       if ( plateau[entree.x][entree.y] == 0) {
          prop[entree.x][entree.y] = 0;
-         printf("À l'eau !\n");
+         printf("À l'eau !\n\n");
       } else {
          prop[entree.x][entree.y] = 1;
-         printf("Touché !\n");
+         printf("Touché !\n\n");
             *nbTouche += 1;
             if ( --nbToucheNav[plateau[entree.x][entree.y]].restant == 0 ){
                int taille_originale = nbToucheNav[plateau[entree.x][entree.y]].total;
-               printf("Vous avez coulé un navire de taille %d !\n", taille_originale );
+               printf("Vous avez coulé un navire de taille %d !\n\n", taille_originale );
             }
       }
    } else printf("Déjà joué !\n");
@@ -315,21 +317,24 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, C
 }
 
 
-Case entrerProposition(int taille_plateau) {
+Case entrerProposition(int taille_plateau, int *radar) {
    Case proposition;
-   int propValide;
+   int propValide = 0;
 
    do {
       char entree[20];
-      printf( "Veuillez entrer les coordonnées X-Y (de 0 à %d) : ", TAILLE_PLATEAU_MAX );
+      printf( "Veuillez entrer les coordonnées X-Y : ", TAILLE_PLATEAU_MAX );
       scanf( " %s19[^\n]", entree ); // aussi verifier pour chars dans le texte
 
-      char *entreeX = strtok(entree, " -,.:");
+      char *entreeX = strtok(entree, " _-+,.:!@#$^&*");
       char *entreeY = strtok(NULL, "");
 
       if ( strcmp( entreeX, "s" ) == 0 || strcmp( entreeX, "S" ) == 0 ){
          printf("Sauvegarde de la partie (fonction à venir)\n\n");
-      } else propValide = estPropositionValide(entreeX, entreeY, taille_plateau, &proposition);
+      } else if ( strcmp( entreeX, "uuddlrlrba" ) == 0 || strcmp( entreeX, "UUDDLRLRBA" ) == 0 ){
+         printf(" == Radar activé ! == \n\n");
+         *radar = 1;
+      } else  propValide = estPropositionValide(entreeX, entreeY, taille_plateau, &proposition);
    } while ( propValide == 0 );
 
    return proposition;
@@ -423,6 +428,7 @@ void libererMatrice(int **matrice, int taille_plateau) {
 int main( int argc, char** argv ) {
    int nbTouche = 0;
    int nbJoue = 0;
+   int radar = 0;
    Cases_nav nbToucheNav[NOMBRE_NAVIRES + 1];
       
    printf( "\nBienvenue au jeu de bataille navale!\n\n");
@@ -437,10 +443,11 @@ int main( int argc, char** argv ) {
    affichage_grille(prop, taille_plateau);
 
    while( nbTouche < nbTotalCasesNav ){       // remplacer par une valeur plus concrète...
-      proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
+      proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau, &radar);
 
-      //affichage_plateau(plateau, taille_plateau, prop);
-      affichage_grille(prop, taille_plateau);
+      if (radar == 1) {
+         affichage_plateau(plateau, taille_plateau, prop);
+      } else affichage_grille(prop, taille_plateau);
       
       printf("Nombre touché : %d sur %d\n", nbTouche, nbTotalCasesNav);
       printf("Nombre de coups : %d \n", nbJoue);
