@@ -145,7 +145,7 @@ int estNumerique( char *chaine );
  * 
  * Affiche le plateau (pour fins de debugage)
  */
-void affichage_plateau(int **plateau, int taille_plateau, int **prop);
+void affichage_plateau(int **plateau, int taille_plateau, int **prop, int *radar);
 
 /**
  * 
@@ -323,7 +323,7 @@ Case entrerProposition(int taille_plateau, int *radar) {
 
    do {
       char entree[20];
-      printf( "Veuillez entrer les coordonnées X-Y : ", TAILLE_PLATEAU_MAX );
+      printf( "Veuillez entrer les coordonnées X-Y : ");
       scanf( " %s19[^\n]", entree ); // aussi verifier pour chars dans le texte
 
       char *entreeX = strtok(entree, " _-+,.:!@#$^&*");
@@ -373,7 +373,7 @@ int estNumerique( char *chaine ) {
 }
 
 
-void affichage_plateau(int **plateau, int taille_plateau, int **prop) {
+void affichage_plateau(int **plateau, int taille_plateau, int **prop, int *radar) {
          printf("   ");
    for ( int x = 0; x < taille_plateau; x++ ){
       printf( "%3d", x );
@@ -383,30 +383,11 @@ void affichage_plateau(int **plateau, int taille_plateau, int **prop) {
       printf( "%3d", y );
       for ( int x = 0; x < taille_plateau; x++ ){
          if (prop[x][y] == -1 ){
-            if (plateau[x][y] == 0 ){
-               printf( "  %s", CASE_NEUTRE );
-            } else printf( "  %d", plateau[x][y]);
-         } else if (prop[x][y] == 0 ) {
-            printf( "  %s", CASE_VIDE );
-         } else printf( "  %s", CASE_NAVIRE );
-      }
-      printf("\n");
-   }
-   printf("\n");
-}
 
+            if (*radar == 1 && plateau[x][y] != 0 ){
+               printf( "  %d", plateau[x][y]);
+            } else printf( "  %s", CASE_NEUTRE );
 
-void affichage_grille(int **prop, int taille_plateau) {
-      printf("   ");
-   for ( int x = 0; x < taille_plateau; x++ ){
-      printf( "%3d", x );
-   }
-   printf("\n");
-   for ( int y = 0; y < taille_plateau; y++ ){
-      printf( "%3d", y );
-      for ( int x = 0; x < taille_plateau; x++ ){
-         if (prop[x][y] == -1 ){
-            printf( "  %s", CASE_NEUTRE );
          } else if (prop[x][y] == 0 ) {
             printf( "  %s", CASE_VIDE );
          } else printf( "  %s", CASE_NAVIRE );
@@ -440,14 +421,11 @@ int main( int argc, char** argv ) {
    initialisation_plateau( plateau, taille_plateau, nbToucheNav );
    int nbTotalCasesNav = compteCasesTotalesNavires(nbToucheNav);
 
-   affichage_grille(prop, taille_plateau);
+   affichage_plateau(plateau, taille_plateau, prop, &radar);
 
    while( nbTouche < nbTotalCasesNav ){       // remplacer par une valeur plus concrète...
       proposition_joueur(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau, &radar);
-
-      if (radar == 1) {
-         affichage_plateau(plateau, taille_plateau, prop);
-      } else affichage_grille(prop, taille_plateau);
+      affichage_plateau(plateau, taille_plateau, prop, &radar);
       
       printf("Nombre touché : %d sur %d\n", nbTouche, nbTotalCasesNav);
       printf("Nombre de coups : %d \n", nbJoue);
