@@ -113,8 +113,7 @@ int estCaseSurLePlateau ( Case caseAValider, int taille_plateau );
  */
 void ajouteNavire( Navire nav, int **plateau, int numeroNavire );
 
-void joue_partie(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, 
-                 int taille_plateau);
+void joue_partie(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, int taille_plateau);
 
 /**
  * Demande à l’utilisateur de saisir une case (x,y) à jouer et selon la valeur contenue plateau[x][y] 
@@ -300,10 +299,11 @@ int compteCasesTotalesNavires( Cases_navire *nbToucheNav ) {
    return total;
 }
 
-void joue_partie(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, 
-               int taille_plateau) {
+void joue_partie(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, int taille_plateau) {
    int nbTotalCasesNav = compteCasesTotalesNavires(nbToucheNav); // pourrait faire partie de la sauvegarde...
    int radar = 0;
+
+   affichage_plateau(plateau, taille_plateau, prop, radar);
 
    while( *nbTouche < nbTotalCasesNav ) {
       Case proposition_mjl = entrerProposition(taille_plateau, &radar, plateau, prop, *nbTouche, *nbJoue, nbToucheNav);
@@ -538,7 +538,6 @@ int main( int argc, char** argv ) {
       }
    } while ( !taille_valide );
 
-   affichage_plateau(plateau, taille_plateau, prop, 0);
    joue_partie(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
    libererMatrice(plateau, taille_plateau);
    libererMatrice(prop, taille_plateau);
