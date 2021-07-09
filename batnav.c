@@ -35,24 +35,24 @@
 #endif
 
 typedef struct coordonne {
-int x;         // position sur le plateau en x
-int y;         // position sur le plateau en y
+int x;            // position sur le plateau en x
+int y;            // position sur le plateau en y
 } Coordonne;
 
 typedef struct sens {
-int x;         // direction gauche/droite (-1, 0, 1)
-int y;         // direction haut/bas (-1, 0, 1)
+int x;            // direction gauche/droite (-1, 0, 1)
+int y;            // direction haut/bas (-1, 0, 1)
 } Sens;
 
 typedef struct une_case {
-int pos_navires; // position des navires
-int pos_tirs;    // position des tirs
+int pos_navires;  // position des navires
+int pos_tirs;     // position des tirs
 } Case;
 
 typedef struct navire {
 Sens sens;   
 Coordonne premiere_case;
-int taille;    // entre 2 à 6 cases
+int taille;       // entre 2 à 6 cases
 } Navire;
 
 typedef struct statistiques_navires {
@@ -430,30 +430,35 @@ int estNumerique( char *chaine ) {
 
 void sauvegarde(Case **plateau, int nbTouche, int nbJoue, Cases_navire *nbToucheNav, int taille_plateau) {
    FILE *fichier;
-
    if ( ( fichier = fopen( FICHIER_SAUVEGARDE, "w" ) ) == NULL ) {
-      fprintf( stderr, "Impossible d'écrire le fichier demandé.\n" );
-      // ajouter options pour quitter ou continuer...
+      fprintf( stderr, "Impossible d'écrire le fichier demandé. " );
+
    } else {
       fprintf( fichier, "%d,%d,%d\n", taille_plateau, nbJoue, nbTouche);
-
       for(int i = 1; i <= NOMBRE_NAVIRES; i++ ) {
          fprintf( fichier, "%d,%d\n", nbToucheNav[i].restant, nbToucheNav[i].au_depart);
       }
-      
       sauvegarde_matrice(plateau, taille_plateau, fichier);
-      fclose( fichier );
+      fclose( fichier );  // valider le succes...
 
-      printf("\nPartie sauvegardée. Désirez-vous quitter le jeu ? (o/n)\n");  // valider le succes...
-      
-      char entree[20];
-      scanf( " %s19[^\n]", entree ); // aussi verifier pour chars dans le texte
-      if ( strcmp( entree, "o" ) == 0 || strcmp( entree, "O" ) == 0 ){
-         printf("\nAu revoir !\n\n");
-         exit(0);
-      }
+      printf("\nPartie sauvegardée. ");  
+   }
+   donne_option_quitter();
+}
+
+
+void donne_option_quitter(){
+   char entree[20];
+
+   printf("Désirez-vous quitter le jeu ? (o/n)\n");
+   scanf( " %s19[^\n]", entree );
+   
+   if ( strcmp( entree, "o" ) == 0 || strcmp( entree, "O" ) == 0 ){
+      printf("\nAu revoir !\n\n");
+      exit(0);
    }
 }
+
 
 void sauvegarde_matrice(Case **matrice, int taille_plateau, FILE *fichier ) {
    for ( int y = 0; y < taille_plateau; y++ ){
