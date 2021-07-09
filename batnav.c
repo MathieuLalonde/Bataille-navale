@@ -72,7 +72,7 @@ int nb_aleatoire(int max);
 /**
  * 
  */
-int choisirTaillePlateau();
+Case** preparer_plateau( int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, int *taille_plateau);
 
 /**
  * 
@@ -183,12 +183,40 @@ return (random()%max);
 }
 
 
-int choisirTaillePlateau(){
-   int taille_plateau = 0;
+Case** preparer_plateau( int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, int *taille_plateau) {
+   Case **plateau;
 
+   int taille_valide = 0;
+   do {
+      char entree[10]; // remplacer par valeur dynamique et debugger
+      printf( "Veuillez entrer la taille du tableau de jeu (%d-%d) : ", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
+      scanf(" %s9[^\n]", entree);
 
-   
-   return taille_plateau;
+      // Message ouverture de partie ici?? Si sauvegarde présente??
+
+      if ( strcmp( entree, "o" ) == 0 || strcmp( entree, "O" ) == 0 ){
+         FILE *fichier;
+
+         if ( ( fichier = fopen( FICHIER_SAUVEGARDE, "r" ) ) == NULL ) {
+            fprintf( stderr, "Impossible de lire le fichier demandé.\n" );
+         } else { 
+            plateau = lecture_sauvegarde( nbTouche, nbJoue, nbToucheNav, taille_plateau, fichier );
+            fclose( fichier );
+            taille_valide = 1;
+         }
+
+      } else {
+         *taille_plateau = atoi(entree);     
+         if ( *taille_plateau >= TAILLE_PLATEAU_MIN && *taille_plateau <= TAILLE_PLATEAU_MAX ) {
+            printf( "Vous avez choisi un tableau de jeu de %d x %d.\n\n", *taille_plateau, *taille_plateau);
+            plateau = creerMatrice( *taille_plateau);  
+            initialisation_plateau( plateau, *taille_plateau, nbToucheNav );   
+            taille_valide = 1;
+         } else printf( "Taille invalide.\n");
+      }
+   } while ( !taille_valide );
+
+   return plateau;
 }
 
 
@@ -503,42 +531,12 @@ void libererMatrice(Case **matrice, int taille_plateau) {
 
 int main( int argc, char** argv ) {
    int nbTouche = 0, nbJoue = 0, taille_plateau;
-   Case **plateau;
    Cases_navire nbToucheNav[NOMBRE_NAVIRES + 1];
-
-   init_nb_aleatoire();
 
    printf( "\nBienvenue au jeu de bataille navale!\n\n");
 
-   int taille_valide = 0;
-   do {
-      char entree[10]; // remplacer par valeur dynamique et debugger
-      printf( "Veuillez entrer la taille du tableau de jeu (%d-%d) : ", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
-      scanf(" %s9[^\n]", entree);
-
-      // Message ouverture de partie ici?? Si sauvegarde présente??
-
-      if ( strcmp( entree, "o" ) == 0 || strcmp( entree, "O" ) == 0 ){
-         FILE *fichier;
-
-         if ( ( fichier = fopen( FICHIER_SAUVEGARDE, "r" ) ) == NULL ) {
-            fprintf( stderr, "Impossible de lire le fichier demandé.\n" );
-         } else { 
-            plateau = lecture_sauvegarde( &nbTouche, &nbJoue, nbToucheNav, &taille_plateau, fichier );
-            fclose( fichier );
-            taille_valide = 1;
-         }
-
-      } else {
-         taille_plateau = atoi(entree);     
-         if ( taille_plateau >= TAILLE_PLATEAU_MIN && taille_plateau <= TAILLE_PLATEAU_MAX ) {
-            printf( "Vous avez choisi un tableau de jeu de %d x %d.\n\n", taille_plateau, taille_plateau);
-            plateau = creerMatrice( taille_plateau);  
-            initialisation_plateau( plateau, taille_plateau, nbToucheNav );   
-            taille_valide = 1;
-         } else printf( "Taille invalide.\n");
-      }
-   } while ( !taille_valide );
+   init_nb_aleatoire();
+   Case **plateau = preparer_plateau( &nbTouche, &nbJoue, nbToucheNav, &taille_plateau );
 
    joue_partie(plateau, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
    libererMatrice(plateau, taille_plateau);
