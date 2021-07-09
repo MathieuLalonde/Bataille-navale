@@ -32,19 +32,24 @@
 #  define CASE_NEUTRE "\033[0;34m.\033[0m"
 #endif
 
-typedef struct une_case {
-int x;         // position de la case en x
-int y;         // position de la case en y
-} Case;
+typedef struct coordonne {
+int x;         // position sur le plateau en x
+int y;         // position sur le plateau en y
+} Coordonne;
 
 typedef struct sens {
-int x;
-int y;
+int x;         // direction gauche/droite (-1, 0, 1)
+int y;         // direction haut/bas (-1, 0, 1)
 } Sens;
+
+typedef struct une_case {
+int pos_navires; // position des navires
+int pos_tirs;    // position des tirs
+} Case;
 
 typedef struct navire {
 Sens sens;   
-Case premiere_case;
+Coordonne premiere_case;
 int taille;    // entre 2 à 6 cases
 } Navire;
 
@@ -72,12 +77,12 @@ int choisirTaillePlateau();
 /**
  * 
  */
-int** creerMatrice( int taille_plateau, int valeur_initiale);
+Case** creerMatrice( int taille_plateau);
 
 /**
  * Initialise aléatoirement six navires de taille 2 à 6 dans le plateau.
  */
-void initialisation_plateau( int **plateau, int taille_plateau, Cases_navire *nbToucheNav );
+void initialisation_plateau( Case **plateau, int taille_plateau, Cases_navire *nbToucheNav );
 
 /**
  * Créer un navire d’une taille donnée dont la case de départ et le sens sont fixés aléatoirement. 
@@ -95,25 +100,25 @@ Sens sens_aleatoire();
  * - plateau est une matrice représentant le plateau de jeu, dans laquelle les cases 
  * occupées par des navires contiennent un 1 et les autres un 0.
 */
-int est_valide(int **plateau, int taille_plateau, struct navire *nav);
+int est_valide(Case **plateau, int taille_plateau, struct navire *nav);
 
 
 /**
  *  Calcule jusqu'où va se rendra le navire
  */
-Case calculeDerniereCase( struct navire *nav );
+Coordonne calculeDerniereCase( struct navire *nav );
 
 /**
  * 
  */
-int estCaseSurLePlateau ( Case caseAValider, int taille_plateau );
+int estCaseSurLePlateau ( Coordonne caseAValider, int taille_plateau );
 
 /**
  * 
  */
-void ajouteNavire( Navire nav, int **plateau, int numeroNavire );
+void ajouteNavire( Navire nav, Case **plateau, int numeroNavire );
 
-void joue_partie(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, int taille_plateau);
+void joue_partie(Case **plateau, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, int taille_plateau);
 
 /**
  * Demande à l’utilisateur de saisir une case (x,y) à jouer et selon la valeur contenue plateau[x][y] 
@@ -127,27 +132,27 @@ void joue_partie(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_na
 - nbToucheNav est un tableau qui contient le nombre de cases touchées pour chaque navire. 
 nbToucheNav[i] indique le nombre de cases touchées pour le navire de taille i. 
 */
-void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, Case entree);
+void proposition_joueur(Case **plateau, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, Coordonne entree);
 
 /**
  * 
  */
-Case entrerProposition(int taille_plateau, int *radar, int **plateau, int **prop,
+Coordonne entrerProposition(int taille_plateau, int *radar, Case **plateau,
                         int nbTouche, int nbJoue, Cases_navire *nbToucheNav) ;
 
 /**
  * 
  */
-int estPropositionValide( char *entreeX, char *entreeY, int taille_plateau, Case *proposition);
+int estPropositionValide( char *entreeX, char *entreeY, int taille_plateau, Coordonne *proposition);
 
 /**
  * 
  */
 int estNumerique( char *chaine );
 
-void sauvegarde(int **plateau, int **prop, int nbTouche, int nbJoue, Cases_navire *nbToucheNav, int taille_plateau);
+void sauvegarde(Case **plateau, int nbTouche, int nbJoue, Cases_navire *nbToucheNav, int taille_plateau);
 
-void sauvegarde_matrice(int **matrice, int taille_plateau, FILE *fichier );
+void sauvegarde_matrice(Case **matrice, int taille_plateau, FILE *fichier );
 
 void lecture_sauvegarde(int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav,
                         int *taille_plateau, FILE *fichier);
@@ -158,13 +163,13 @@ void lecture_matrice( int **matrice, int taille_plateau, FILE *fichier );
  * 
  * Affiche le plateau (pour fins de debugage)
  */
-void affichage_plateau(int **plateau, int taille_plateau, int **prop, int radar);
+void affichage_plateau(Case **plateau, int taille_plateau, int radar);
 
 /**
  * 
  * 
  */
-void affichage_grille(int **prop, int taille_plateau);
+void affichage_grille(Case **plateau, int taille_plateau);
 
 
 
@@ -187,24 +192,25 @@ int choisirTaillePlateau(){
 }
 
 
-int** creerMatrice(int taille_plateau, int valeur_initiale) {
-   int **matrice = calloc( sizeof( int* ), taille_plateau );   // mettre +1 ici si besoin d'identifier la fin
+Case** creerMatrice(int taille_plateau) {
+   Case **matrice = calloc( sizeof( Case* ), taille_plateau );   // mettre +1 ici si besoin d'identifier la fin
 
    for ( int i = 0; i < taille_plateau; i++ ){
-         matrice[i] = calloc ( sizeof( int ), taille_plateau );
+         matrice[i] = calloc ( sizeof( Case ), taille_plateau );
    }
 
    // Initialisation à valeur_initiale
    for ( int i = 0; i < taille_plateau; i++ ){
       for ( int j = 0; j < taille_plateau; j++ ){
-         matrice[i][j] = valeur_initiale;
+         matrice[i][j].pos_navires = 0;
+         matrice[i][j].pos_tirs = -1;
       }
    }
    return matrice;
 }
 
 
-void initialisation_plateau( int **plateau, int taille_plateau, Cases_navire *nbToucheNav ) {
+void initialisation_plateau( Case **plateau, int taille_plateau, Cases_navire *nbToucheNav ) {
    int i = 1;
 
    while( i <= NOMBRE_NAVIRES) {
@@ -249,8 +255,8 @@ Sens sens_aleatoire() {
 }
 
 
-int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
-   Case derniereCase = calculeDerniereCase(nav);
+int est_valide( Case **plateau, int taille_plateau, struct navire *nav ) {
+   Coordonne derniereCase = calculeDerniereCase(nav);
 
    // Vérifie si le navire sort du plateau
    if ( !estCaseSurLePlateau ( derniereCase, taille_plateau ) ) {
@@ -258,7 +264,7 @@ int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
    }
    // Vérifie si la place du navire est déjà occupée
    for ( int i = 0; i < nav->taille; i++){
-      if (plateau[nav->premiere_case.x + ( i * nav->sens.x )][nav->premiere_case.y + ( i * nav->sens.y )] != 0 ) {
+      if (plateau[nav->premiere_case.x + ( i * nav->sens.x )][nav->premiere_case.y + ( i * nav->sens.y )].pos_navires != 0 ) {
          return 0;
       }
    }
@@ -267,15 +273,15 @@ int est_valide( int **plateau, int taille_plateau, struct navire *nav ) {
 }
 
 
-Case calculeDerniereCase( struct navire *nav ){
-   Case derniereCase;
+Coordonne calculeDerniereCase( struct navire *nav ){
+   Coordonne derniereCase;
    derniereCase.x = nav->premiere_case.x + ( nav->taille * nav->sens.x );
    derniereCase.y = nav->premiere_case.y + ( nav->taille * nav->sens.y );
    return derniereCase;
 }
 
 
-int estCaseSurLePlateau ( Case caseAValider, int taille_plateau ) {
+int estCaseSurLePlateau ( Coordonne caseAValider, int taille_plateau ) {
    if ( caseAValider.x >= taille_plateau || caseAValider.x < 0 
             || caseAValider.y >= taille_plateau || caseAValider.y < 0) {
       return 0;
@@ -283,9 +289,9 @@ int estCaseSurLePlateau ( Case caseAValider, int taille_plateau ) {
 }
 
 
-void ajouteNavire( Navire nav, int **plateau, int numeroNavire ) {
+void ajouteNavire( Navire nav, Case **plateau, int numeroNavire ) {
    for ( int i = 0; i < nav.taille; i++){
-      plateau[nav.premiere_case.x + ( i * nav.sens.x )][nav.premiere_case.y + ( i * nav.sens.y )] = numeroNavire;
+      plateau[nav.premiere_case.x + ( i * nav.sens.x )][nav.premiere_case.y + ( i * nav.sens.y )].pos_navires = numeroNavire;
    }
 }
 
@@ -299,34 +305,34 @@ int compteCasesTotalesNavires( Cases_navire *nbToucheNav ) {
    return total;
 }
 
-void joue_partie(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, int taille_plateau) {
+void joue_partie(Case **plateau, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, int taille_plateau) {
    int nbTotalCasesNav = compteCasesTotalesNavires(nbToucheNav); // pourrait faire partie de la sauvegarde...
    int radar = 0;
 
-   affichage_plateau(plateau, taille_plateau, prop, radar);
+   affichage_plateau(plateau, taille_plateau, radar);
 
    while( *nbTouche < nbTotalCasesNav ) {
-      Case proposition_mjl = entrerProposition(taille_plateau, &radar, plateau, prop, *nbTouche, *nbJoue, nbToucheNav);
+      Coordonne proposition_mjl = entrerProposition(taille_plateau, &radar, plateau, *nbTouche, *nbJoue, nbToucheNav);
 
-      proposition_joueur(plateau, prop, nbTouche, nbJoue, nbToucheNav, proposition_mjl);
-      affichage_plateau(plateau, taille_plateau, prop, radar);
+      proposition_joueur(plateau, nbTouche, nbJoue, nbToucheNav, proposition_mjl);
+      affichage_plateau(plateau, taille_plateau, radar);
       printf("Nombre touché : %d sur %d\n", *nbTouche, nbTotalCasesNav);
       printf("Nombre de coups : %d \n", *nbJoue);
    }
    printf( "\nFélicitations, vous avez coulé les %d navires en %d coups !\n\n", NOMBRE_NAVIRES, *nbJoue);
 }
 
-void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, Case entree) {
-   if ( prop[entree.x][entree.y] == -1 ){
-      if ( plateau[entree.x][entree.y] == 0) {
-         prop[entree.x][entree.y] = 0;
+void proposition_joueur(Case **plateau, int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, Coordonne entree) {
+   if ( plateau[entree.x][entree.y].pos_tirs == -1 ){
+      if ( plateau[entree.x][entree.y].pos_navires == 0) {
+         plateau[entree.x][entree.y].pos_tirs = 0;
          printf("À l'eau !\n\n");
       } else {
-         prop[entree.x][entree.y] = 1;
+         plateau[entree.x][entree.y].pos_tirs = 1;
          printf("Touché !\n\n");
             *nbTouche += 1;
-            if ( --nbToucheNav[plateau[entree.x][entree.y]].restant == 0 ){
-               int taille_originale = nbToucheNav[plateau[entree.x][entree.y]].au_depart;
+            if ( --nbToucheNav[plateau[entree.x][entree.y].pos_navires].restant == 0 ){
+               int taille_originale = nbToucheNav[plateau[entree.x][entree.y].pos_navires].au_depart;
                printf("Vous avez coulé un navire de taille %d !\n\n", taille_originale );
             }
       }
@@ -335,9 +341,9 @@ void proposition_joueur(int **plateau, int **prop, int *nbTouche, int *nbJoue, C
 }
 
 
-Case entrerProposition(int taille_plateau, int *radar, int **plateau, int **prop,
+Coordonne entrerProposition(int taille_plateau, int *radar, Case **plateau,
                         int nbTouche, int nbJoue, Cases_navire *nbToucheNav) {
-   Case proposition;
+   Coordonne proposition;
 
      int propValide = 0;
       do {
@@ -349,7 +355,7 @@ Case entrerProposition(int taille_plateau, int *radar, int **plateau, int **prop
          char *entreeY = strtok(NULL, "");
 
          if ( strcmp( entreeX, "s" ) == 0 || strcmp( entreeX, "S" ) == 0 ){
-            sauvegarde(plateau, prop, nbTouche, nbJoue, nbToucheNav, taille_plateau);
+            sauvegarde(plateau, nbTouche, nbJoue, nbToucheNav, taille_plateau);
          } else if ( strcmp( entreeX, "uuddlrlrba" ) == 0 || strcmp( entreeX, "UUDDLRLRBA" ) == 0 ){
             printf(" == Radar activé ! == \n\n");
             *radar = 1;
@@ -360,7 +366,7 @@ Case entrerProposition(int taille_plateau, int *radar, int **plateau, int **prop
 }
 
 
-int estPropositionValide( char *entreeX, char *entreeY, int taille_plateau, Case *proposition) {
+int estPropositionValide( char *entreeX, char *entreeY, int taille_plateau, Coordonne *proposition) {
    int estValide = 0;
 
    if ( estNumerique( entreeX ) && estNumerique( entreeY ) )  {
@@ -392,7 +398,7 @@ int estNumerique( char *chaine ) {
 }
 
 
-void sauvegarde(int **plateau, int **prop, int nbTouche, int nbJoue, Cases_navire *nbToucheNav, int taille_plateau) {
+void sauvegarde(Case **plateau, int nbTouche, int nbJoue, Cases_navire *nbToucheNav, int taille_plateau) {
    FILE *fichier;
 
    if ( ( fichier = fopen( FICHIER_SAUVEGARDE, "w" ) ) == NULL ) {
@@ -406,7 +412,6 @@ void sauvegarde(int **plateau, int **prop, int nbTouche, int nbJoue, Cases_navir
       }
       
       sauvegarde_matrice(plateau, taille_plateau, fichier);
-      sauvegarde_matrice(prop, taille_plateau, fichier);
       fclose( fichier );
 
       printf("\nPartie sauvegardée. Désirez-vous quitter le jeu ? (o/n)\n");  // valider le succes...
@@ -420,10 +425,11 @@ void sauvegarde(int **plateau, int **prop, int nbTouche, int nbJoue, Cases_navir
    }
 }
 
-void sauvegarde_matrice(int **matrice, int taille_plateau, FILE *fichier ) {
+void sauvegarde_matrice(Case **matrice, int taille_plateau, FILE *fichier ) {
    for ( int y = 0; y < taille_plateau; y++ ){
       for ( int x = 0; x < taille_plateau; x++ ){
-         fprintf( fichier, "%d\n", matrice[x][y]);
+         fprintf( fichier, "%d\n", matrice[x][y].pos_navires);
+         fprintf( fichier, "%d\n", matrice[x][y].pos_tirs);
       }
    }
 }
@@ -462,7 +468,7 @@ void lecture_matrice( int **matrice, int taille_plateau, FILE *fichier ){
 }
 
 
-void affichage_plateau(int **plateau, int taille_plateau, int **prop, int radar) {
+void affichage_plateau(Case **plateau, int taille_plateau, int radar) {
    printf("   ");
    for ( int x = 0; x < taille_plateau; x++ ){
       printf( "%3d", x );
@@ -471,13 +477,13 @@ void affichage_plateau(int **plateau, int taille_plateau, int **prop, int radar)
    for ( int y = 0; y < taille_plateau; y++ ){
       printf( "%3d", y );
       for ( int x = 0; x < taille_plateau; x++ ){
-         if (prop[x][y] == -1 ){
+         if (plateau[x][y].pos_tirs == -1 ){
 
-            if (radar == 1 && plateau[x][y] != 0 ){
-               printf( "  %d", plateau[x][y]);
+            if (radar == 1 && plateau[x][y].pos_navires != 0 ){
+               printf( "  %d", plateau[x][y].pos_navires);
             } else printf( "  %s", CASE_NEUTRE );
 
-         } else if (prop[x][y] == 0 ) {
+         } else if (plateau[x][y].pos_tirs == 0 ) {
             printf( "  %s", CASE_VIDE );
          } else printf( "  %s", CASE_NAVIRE );
       }
@@ -497,11 +503,11 @@ void libererMatrice(int **matrice, int taille_plateau) {
 
 int main( int argc, char** argv ) {
    int nbTouche = 0, nbJoue = 0, taille_plateau;
-   int **plateau, **prop;
+   Case **plateau;
    Cases_navire nbToucheNav[NOMBRE_NAVIRES + 1];
 
    init_nb_aleatoire();
-      
+
    printf( "\nBienvenue au jeu de bataille navale!\n\n");
 
    int taille_valide = 0;
@@ -519,10 +525,8 @@ int main( int argc, char** argv ) {
             fprintf( stderr, "Impossible de lire le fichier demandé.\n" );
          } else { 
             lecture_sauvegarde( &nbTouche, &nbJoue, nbToucheNav, &taille_plateau, fichier );
-            plateau = creerMatrice( taille_plateau, 0 );
+            plateau = creerMatrice( taille_plateau);
             lecture_matrice(plateau, taille_plateau, fichier);
-            prop = creerMatrice( taille_plateau, -1 );
-            lecture_matrice(prop, taille_plateau, fichier);
             fclose( fichier );
          }
          taille_valide = 1;
@@ -530,16 +534,13 @@ int main( int argc, char** argv ) {
          taille_plateau = atoi(entree);     
          if ( taille_plateau >= TAILLE_PLATEAU_MIN && taille_plateau <= TAILLE_PLATEAU_MAX ) {
             printf( "Vous avez choisi un tableau de jeu de %d x %d.\n\n", taille_plateau, taille_plateau);
-            plateau = creerMatrice( taille_plateau, 0 );
-            prop = creerMatrice( taille_plateau, -1 );
-            initialisation_plateau( plateau, taille_plateau, nbToucheNav );   
+            plateau = creerMatrice( taille_plateau);  
             taille_valide = 1;
          } else printf( "Taille invalide.\n");
       }
    } while ( !taille_valide );
 
-   joue_partie(plateau, prop, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
+   joue_partie(plateau, &nbTouche, &nbJoue, nbToucheNav, taille_plateau);
    libererMatrice(plateau, taille_plateau);
-   libererMatrice(prop, taille_plateau);
    exit(0);
 }
