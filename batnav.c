@@ -23,10 +23,12 @@
 #define TAMPON 10
 
 #ifndef DELUXE
+#  define EST_DELUXE 0
 #  define CASE_NAVIRE "X"
 #  define CASE_VIDE "O"
 #  define CASE_NEUTRE "."
 #else 
+#  define EST_DELUXE 1
 #  define CASE_NAVIRE "\033[0;31mX\033[0m"
 #  define CASE_VIDE "\033[0;34mO\033[0m"
 #  define CASE_NEUTRE "\033[0;34m.\033[0m"
@@ -190,11 +192,12 @@ Case** preparer_plateau( int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav, 
    do {
       char entree[10]; // remplacer par valeur dynamique et debugger
       printf( "Veuillez entrer la taille du tableau de jeu (%d-%d) : ", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
+      
       scanf(" %s9[^\n]", entree);
 
-      // Message ouverture de partie ici?? Si sauvegarde présente??
+      // Message ouverture de partie ici?? Seulement si sauvegarde présente??
 
-      if ( strcmp( entree, "o" ) == 0 || strcmp( entree, "O" ) == 0 ){
+      if ( EST_DELUXE && ( strcmp( entree, "o" ) == 0 || strcmp( entree, "O" ) == 0 ) ) {
          FILE *fichier;
 
          if ( ( fichier = fopen( FICHIER_SAUVEGARDE, "r" ) ) == NULL ) {
@@ -377,12 +380,11 @@ Coordonne entrerProposition(int taille_plateau, int *radar, Case **plateau,
       do {
          char entree[20];
          printf( "Veuillez entrer les coordonnées X-Y : ");
-         scanf( " %s19[^\n]", entree ); // aussi verifier pour chars dans le texte
-
+         scanf( " %s19[^\n]", entree );
          char *entreeX = strtok(entree, " _-+,.:!@#$^&*");
          char *entreeY = strtok(NULL, "");
 
-         if ( strcmp( entreeX, "s" ) == 0 || strcmp( entreeX, "S" ) == 0 ){
+         if ( EST_DELUXE && ( strcmp( entreeX, "s" ) == 0 || strcmp( entreeX, "S" ) == 0 ) ) {
             sauvegarde(plateau, nbTouche, nbJoue, nbToucheNav, taille_plateau);
          } else if ( strcmp( entreeX, "uuddlrlrba" ) == 0 || strcmp( entreeX, "UUDDLRLRBA" ) == 0 ){
             printf(" == Radar activé ! == \n\n");
