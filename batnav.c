@@ -76,15 +76,19 @@ int nb_aleatoire(int max);
  */
 Case** prepare_plateau( int *nb_touche, int *nb_joue, Cases_navire *nb_touche_Nav, int *taille_plateau);
 
+Case** cree_plateau(int taille_plateau, Cases_navire *nb_touche_Nav);
+
+void initialise_plateau( Case **plateau, int taille_plateau );
+
 /**
  * 
  */
-Case** cree_matrice( int taille_plateau);
+Case** aloue_memoire_plateau( int taille_plateau);
 
 /**
  * Initialise aléatoirement six navires de taille 2 à 6 dans le plateau.
  */
-void initialise_plateau( Case **plateau, int taille_plateau, Cases_navire *nb_touche_Nav );
+void ajoute_navires( Case **plateau, int taille_plateau, Cases_navire *nb_touche_Nav );
 
 /**
  * Créer un navire d’une taille donnée dont la case de départ et le sens sont fixés aléatoirement. 
@@ -102,7 +106,7 @@ Sens cree_sens_aleatoire();
  * - plateau est une matrice représentant le plateau de jeu, dans laquelle les cases 
  * occupées par des navires contiennent un 1 et les autres un 0.
 */
-int est_valide(Case **plateau, int taille_plateau, struct navire *nav);
+int est_navire_valide(Case **plateau, int taille_plateau, struct navire *nav);
 
 
 /**
@@ -118,7 +122,7 @@ int est_case_sur_plateau ( Coordonne case_a_valider, int taille_plateau );
 /**
  * 
  */
-void ajoute_navire( Navire nav, Case **plateau, int numeroNavire );
+void sauvegarde_navire( Navire nav, Case **plateau, int numeroNavire );
 
 void joue_partie(Case **plateau, int *nb_touche, int *nb_joue, Cases_navire *nb_touche_Nav, int taille_plateau);
 
@@ -183,68 +187,71 @@ return (random()%max);
 
 Case** prepare_plateau( int *nb_touche, int *nb_joue, Cases_navire *nb_touche_Nav, int *taille_plateau) {
    Case **plateau;
-
-   int taille_valide = 0;
+   int est_taille_valide = 0;
    do {
-      char entree[10]; // remplacer par valeur dynamique et debugger
-      printf( "Veuillez entrer la taille du tableau de jeu (%d-%d) : ", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
-      
+      printf( "Veuillez entrer la taille du tableau de jeu (%d-%d) ", TAILLE_PLATEAU_MIN, TAILLE_PLATEAU_MAX );
+      EST_DELUXE ? printf ( "\nou 'o' pour ouvrir une partie sauvegardée : " ) : printf ( ": " );
+
+      char entree[10];
       scanf(" %s9[^\n]", entree);
-
-      // Message ouverture de partie ici?? Seulement si sauvegarde_partie présente??
-
       if ( EST_DELUXE && ( strcmp( entree, "o" ) == 0 || strcmp( entree, "O" ) == 0 ) ) {
-
          FILE *fichier;
 
          if ( ( fichier = fopen( FICHIER_SAUVEGARDE, "r" ) ) == NULL ) {
             fprintf( stderr, "Impossible de lire le fichier demandé.\n" );
          } else { 
             plateau = lit_partie_sauvegardee( nb_touche, nb_joue, nb_touche_Nav, taille_plateau, fichier );
+            est_taille_valide = 1;
             fclose( fichier );
-            taille_valide = 1;
          }
-
       } else {
-         *taille_plateau = atoi(entree);     
+         *taille_plateau = atoi(entree);  
+
          if ( *taille_plateau >= TAILLE_PLATEAU_MIN && *taille_plateau <= TAILLE_PLATEAU_MAX ) {
+            est_taille_valide = 1;
             printf( "Vous avez choisi un tableau de jeu de %d x %d.\n\n", *taille_plateau, *taille_plateau);
-            plateau = cree_matrice( *taille_plateau);  
-            initialise_plateau( plateau, *taille_plateau, nb_touche_Nav );   
-            taille_valide = 1;
+            plateau = cree_plateau( *taille_plateau, nb_touche_Nav ); 
          } else printf( "Taille invalide.\n");
       }
-   } while ( !taille_valide );
-
+   } while ( !est_taille_valide );
    return plateau;
 }
 
 
-Case** cree_matrice(int taille_plateau) {
-   Case **matrice = calloc( sizeof( Case* ), taille_plateau );   // mettre +1 ici si besoin d'identifier la fin
-
-   for ( int i = 0; i < taille_plateau; i++ ){
-         matrice[i] = calloc ( sizeof( Case ), taille_plateau );
-   }
-
-   // Initialisation à valeur_initiale
-   for ( int i = 0; i < taille_plateau; i++ ){
-      for ( int j = 0; j < taille_plateau; j++ ){
-         matrice[i][j].pos_navires = 0;
-         matrice[i][j].pos_tirs = -1;
-      }
-   }
-   return matrice;
+Case** cree_plateau(int taille_plateau, Cases_navire *nb_touche_Nav) {
+   Case **nouveau_plateau = aloue_memoire_plateau( taille_plateau);  
+   initialise_plateau (nouveau_plateau, taille_plateau );
+   ajoute_navires( nouveau_plateau, taille_plateau, nb_touche_Nav );  
+   return nouveau_plateau;
 }
 
 
-void initialise_plateau( Case **plateau, int taille_plateau, Cases_navire *nb_touche_Nav ) {
-   int i = 1;
+Case** aloue_memoire_plateau(int taille_plateau) {
+   Case **plateau = calloc( sizeof( Case* ), taille_plateau );
 
+   for ( int i = 0; i < taille_plateau; i++ ){
+         plateau[i] = calloc ( sizeof( Case ), taille_plateau );
+   }
+   return plateau;
+}
+
+
+void initialise_plateau( Case **plateau, int taille_plateau ){
+   for ( int i = 0; i < taille_plateau; i++ ){
+      for ( int j = 0; j < taille_plateau; j++ ){
+         plateau[i][j].pos_navires = 0;
+         plateau[i][j].pos_tirs = -1;
+      }
+   }
+}
+
+
+void ajoute_navires( Case **plateau, int taille_plateau, Cases_navire *nb_touche_Nav ) {
+   int i = 1;
    while( i <= NOMBRE_NAVIRES) {
       Navire nouveau_navire = cree_navire(taille_plateau);
-      if (est_valide( plateau, taille_plateau, &nouveau_navire ) ){
-         ajoute_navire(nouveau_navire, plateau, i);
+      if (est_navire_valide( plateau, taille_plateau, &nouveau_navire ) ){
+         sauvegarde_navire(nouveau_navire, plateau, i);
          nb_touche_Nav[i].au_depart = nouveau_navire.taille;
          nb_touche_Nav[i].restant = nouveau_navire.taille;
          i++;
@@ -283,7 +290,7 @@ Sens cree_sens_aleatoire() {
 }
 
 
-int est_valide( Case **plateau, int taille_plateau, struct navire *nav ) {
+int est_navire_valide( Case **plateau, int taille_plateau, struct navire *nav ) {
    Coordonne derniere_case = calcule_derniere_case(nav);
 
    // Vérifie si le navire sort du plateau
@@ -317,7 +324,7 @@ int est_case_sur_plateau ( Coordonne case_a_valider, int taille_plateau ) {
 }
 
 
-void ajoute_navire( Navire nav, Case **plateau, int numero_navire ) {
+void sauvegarde_navire( Navire nav, Case **plateau, int numero_navire ) {
    for ( int i = 0; i < nav.taille; i++){
       plateau[nav.premiere_case.x + ( i * nav.sens.x )][nav.premiere_case.y + ( i * nav.sens.y )].pos_navires
             = numero_navire;
@@ -480,7 +487,7 @@ Case** lit_partie_sauvegardee( int *nb_touche, int *nb_joue, Cases_navire *nb_to
       nb_touche_Nav[i].restant = atoi(strtok( ligne, ","));
       nb_touche_Nav[i].au_depart = atoi(strtok( NULL, ""));
    }
-      Case **plateau = cree_matrice( *taille_plateau);
+      Case **plateau = aloue_memoire_plateau( *taille_plateau);
       lit_matrice(plateau, *taille_plateau, fichier);
       printf( "taille: %d\n\n", *taille_plateau);
 
