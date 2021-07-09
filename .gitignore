@@ -1,6 +1,7 @@
 # Fichiers executables
 *.out
 batnav
+sauvegarde
 
 # Autres fichiers C
 *.o
