@@ -154,10 +154,10 @@ void sauvegarde(Case **plateau, int nbTouche, int nbJoue, Cases_navire *nbTouche
 
 void sauvegarde_matrice(Case **matrice, int taille_plateau, FILE *fichier );
 
-void lecture_sauvegarde(int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav,
+Case** lecture_sauvegarde(int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav,
                         int *taille_plateau, FILE *fichier);
 
-void lecture_matrice( int **matrice, int taille_plateau, FILE *fichier );
+void lecture_matrice( Case **matrice, int taille_plateau, FILE *fichier );
 
 /**
  * 
@@ -428,13 +428,12 @@ void sauvegarde(Case **plateau, int nbTouche, int nbJoue, Cases_navire *nbTouche
 void sauvegarde_matrice(Case **matrice, int taille_plateau, FILE *fichier ) {
    for ( int y = 0; y < taille_plateau; y++ ){
       for ( int x = 0; x < taille_plateau; x++ ){
-         fprintf( fichier, "%d\n", matrice[x][y].pos_navires);
-         fprintf( fichier, "%d\n", matrice[x][y].pos_tirs);
+         fprintf( fichier, "%d,%d\n", matrice[x][y].pos_navires, matrice[x][y].pos_tirs);
       }
    }
 }
 
-void lecture_sauvegarde( int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav,
+Case** lecture_sauvegarde( int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav,
                         int *taille_plateau, FILE *fichier) {
    char ligne[TAMPON];
 
@@ -448,21 +447,22 @@ void lecture_sauvegarde( int *nbTouche, int *nbJoue, Cases_navire *nbToucheNav,
       nbToucheNav[i].restant = atoi(strtok( ligne, ","));
       nbToucheNav[i].au_depart = atoi(strtok( NULL, ""));
    }
-
+      Case **plateau = creerMatrice( *taille_plateau);
+      lecture_matrice(plateau, *taille_plateau, fichier);
       printf( "taille: %d\n\n", *taille_plateau);
 
-
-
    printf( "Partie restaurée.\n\n");
+   return plateau;
 }
 
 
-void lecture_matrice( int **matrice, int taille_plateau, FILE *fichier ){
+void lecture_matrice( Case **matrice, int taille_plateau, FILE *fichier ){
    char ligne[TAMPON];
    for ( int y = 0; y < taille_plateau; y++ ){
       for ( int x = 0; x < taille_plateau; x++ ){
          fgets ( ligne, TAMPON, fichier );
-         matrice[x][y] = atoi(ligne);
+         matrice[x][y].pos_navires = atoi(strtok( ligne, ","));
+         matrice[x][y].pos_tirs = atoi(strtok( NULL, ""));
       }
    }
 }
@@ -493,7 +493,7 @@ void affichage_plateau(Case **plateau, int taille_plateau, int radar) {
 }
 
 
-void libererMatrice(int **matrice, int taille_plateau) {
+void libererMatrice(Case **matrice, int taille_plateau) {
    for ( int i = 0; i < taille_plateau; i++ ){
       free (matrice[i]);
    }
@@ -524,17 +524,17 @@ int main( int argc, char** argv ) {
          if ( ( fichier = fopen( FICHIER_SAUVEGARDE, "r" ) ) == NULL ) {
             fprintf( stderr, "Impossible de lire le fichier demandé.\n" );
          } else { 
-            lecture_sauvegarde( &nbTouche, &nbJoue, nbToucheNav, &taille_plateau, fichier );
-            plateau = creerMatrice( taille_plateau);
-            lecture_matrice(plateau, taille_plateau, fichier);
+            plateau = lecture_sauvegarde( &nbTouche, &nbJoue, nbToucheNav, &taille_plateau, fichier );
             fclose( fichier );
+            taille_valide = 1;
          }
-         taille_valide = 1;
+
       } else {
          taille_plateau = atoi(entree);     
          if ( taille_plateau >= TAILLE_PLATEAU_MIN && taille_plateau <= TAILLE_PLATEAU_MAX ) {
             printf( "Vous avez choisi un tableau de jeu de %d x %d.\n\n", taille_plateau, taille_plateau);
             plateau = creerMatrice( taille_plateau);  
+            initialisation_plateau( plateau, taille_plateau, nbToucheNav );   
             taille_valide = 1;
          } else printf( "Taille invalide.\n");
       }
