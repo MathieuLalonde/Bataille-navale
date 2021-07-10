@@ -287,8 +287,11 @@ void sauvegarde_plateau( Case **plateau, int taille_plateau, FILE *fichier );
 
 /**
  * Le joueur a le choix de quitter ou continuer le jeu.
+ * 
+ * @param plateau : La matrice contenant le plateau de jeu
+ * @param taille_plateau : la largeur de l'un des côtés du plateau de jeu
  */
-void donne_option_quitter();
+void donne_option_quitter( Case **plateau , int taille_plateau );
 
 /**
  * Effectue la lecture en mémoire d'une partie déjà sauvegardée.
@@ -632,7 +635,7 @@ void sauvegarde_partie( Case **plateau, int taille_plateau, int nb_joue, int nb_
 
       printf( "\nPartie sauvegardée. " );  
    }
-   donne_option_quitter();
+   donne_option_quitter( plateau, taille_plateau );
 }
 
 
@@ -645,16 +648,22 @@ void sauvegarde_plateau( Case **plateau, int taille_plateau, FILE *fichier ) {
 }
 
 
-void donne_option_quitter() {
+void donne_option_quitter( Case **plateau, int taille_plateau ) {
    char entree[20];
 
-   printf( "Désirez-vous quitter le jeu ? (o/n)\n" );
-   scanf( " %s19[^\n]", entree );
-   
-   if ( strcmp( entree, "o" ) == 0 || strcmp( entree, "O" ) == 0 ) {
-      printf( "\nAu revoir !\n\n" );
-      exit( 0 );
-   }
+   int est_valide = 0;
+   do {
+      printf( "Désirez-vous quitter le jeu ? (o/n)\n" );
+      scanf( " %s19[^\n]", entree );
+
+      if ( strcmp( entree, "o" ) == 0 || strcmp( entree, "O" ) == 0 ) {
+         printf( "\nAu revoir !\n\n" );
+         libere_plateau( plateau, taille_plateau );
+         exit( 0 );
+      } else if ( strcmp( entree, "n" ) == 0 || strcmp( entree, "N" ) == 0 ) {
+         est_valide = 1;
+      }
+   } while ( est_valide == 0 );
 }
 
 
