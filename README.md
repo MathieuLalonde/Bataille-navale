@@ -1,9 +1,9 @@
-# INF3135: TP2 - Été 2021
+# INF3135: TP3 - Été 2021
 Dans ce dépôt, vous retrouverez le codes en langage C pour le TP3 d'INF3135.
 
 Ce logiciel est un jeu de bataille navale. 
 
-Dans cetter version, le joueur doit choisir la taille de son plateau de jeu. Cette taille doit être entre 5 et 50 puisqu'il doit tout de même y avoir assez de place sur le plateau pour les six navires de tailles diverses et que ce tableau doit pouvoir être affiché sur un écran de taille moyenne.
+N.B. Dans cette version, le joueur doit choisir la taille de son plateau de jeu. Cette taille doit être entre 5 et 50 puisqu'il doit tout de même y avoir assez de place sur le plateau pour les six navires de tailles diverses et que ce tableau doit pouvoir être affiché sur un écran de taille moyenne.
 
 ## Fichiers :
 Voici les fichiers contenus dans ce dépot :
@@ -23,7 +23,7 @@ ou via **Make** et le `Makefile` du projet en utilisant la commande :
 ```sh
 $ make
 ```
-N.B. la commande make lancera ensuite automatiquement l'exécution du logiciel.
+N.B. La commande make lancera ensuite automatiquement l'exécution du logiciel.
 
 ## Exécution :
 Le programme compilé peut ensuite être exécuté manuelement avec la commande :
@@ -35,10 +35,7 @@ $ ./batnav
 
 Un mode d'affichage `radar` permettant de voir où se trouvent tous les navires sur le plateau peut être accédé en entrant un code secret quand vient le temps d'entrer les coordonnées X-Y.
 
-Ce code est une variante du "code Konami" :
-```sh
-uuddlrlrba
-```
+Ce code est une variante du "code Konami" : `uuddlrlrba`
 
 ## Version `deluxe` du jeu :
 
@@ -48,9 +45,9 @@ Une version améliorée du jeu est également disponible en compilant le code av
 ```sh
 $ gcc batnav.c -DDELUXE -o batnav
 ```
-ou via **Make** et le `Makefile` du projet en utilisant la commande suivante :
+ou via Make et le Makefile du projet en utilisant la commande suivante :
 
 ```sh
 $ make deluxe
 ```
-Cette verion ajoute l'option de sauvegarder une partie en cours de route et de la continuer à un autre moment. Elle offre également un affichage  du plateau de jeu `en couleur`!
+Cette verion ajoute l'option de sauvegarder une partie en cours de route et de la continuer à un autre moment. Elle offre également un affichage  du plateau de jeu en couleur!
