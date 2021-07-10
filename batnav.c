@@ -545,7 +545,8 @@ Coord entre_proposition( Case **plateau, int taille_plateau, int nb_joue, int nb
    int est_valide = 0;
    do {
       char entree[20];
-      printf( "Veuillez entrer les coordonnées X-Y : " );
+      printf( "Veuillez entrer les coordonnées X-Y " );
+      EST_DELUXE ? printf ( "\nou 's' pour sauvegarder la partie : " ) : printf ( ": " );
       scanf( " %s19[^\n]", entree );
       char *entreeX = strtok( entree, " _-+,.:!@#$^&*" );
       char *entreeY = strtok( NULL, "" );
