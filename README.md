@@ -3,7 +3,7 @@ Dans ce dépôt, vous retrouverez le codes en langage C pour le TP3 d'INF3135.
 
 Ce logiciel est un jeu de bataille navale. 
 
-N.B. Dans cette version, le joueur doit choisir la taille de son plateau de jeu. Cette taille doit être entre 5 et 50 puisqu'il doit tout de même y avoir assez de place sur le plateau pour les six navires de tailles diverses et que ce tableau doit pouvoir être affiché sur un écran de taille moyenne.
+N.B. Dans cette version, le joueur doit choisir la taille de son plateau de jeu. Cette taille doit être entre 6 et 50 puisqu'il doit tout de même y avoir assez de place sur le plateau pour les six navires de tailles diverses et que ce tableau doit pouvoir être affiché sur un écran de taille moyenne.
 
 ## Fichiers :
 Voici les fichiers contenus dans ce dépot :

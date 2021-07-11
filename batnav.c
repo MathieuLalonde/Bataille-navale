@@ -17,7 +17,7 @@
 #define NOMBRE_NAVIRES 6
 #define TAILLE_NAVIRE_MIN 2
 #define TAILLE_NAVIRE_MAX 6
-#define TAILLE_PLATEAU_MIN 5
+#define TAILLE_PLATEAU_MIN 6
 #define TAILLE_PLATEAU_MAX 50
 #define FICHIER_SAUVEGARDE "sauvegarde"
 #define TAMPON 10
@@ -401,6 +401,7 @@ void initialise_plateau( Case **plateau, int taille_plateau ) {
 
 void ajoute_navires( Case **plateau, int taille_plateau, Cases_navire *nb_cases_navire ) {
    int i = 1;
+
    while( i <= NOMBRE_NAVIRES ) {
       Navire nouveau_navire = cree_navire(taille_plateau);
       if ( est_navire_valide( plateau, taille_plateau, &nouveau_navire ) ) {
