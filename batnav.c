@@ -3,7 +3,7 @@
  *
  * @author Mathieu Lalonde
  * @code_permanent LALM14127501
- * @date 2021/07/08
+ * @date 2021/07/11
  *
  * Jeu de bataille navale.
  */
@@ -348,7 +348,7 @@ Case** prepare_plateau( int *taille_plateau, int *nb_joue, int *nb_touche, Cases
          // lecture d'une partie sauvegardée:
          FILE *fichier;
          if ( ( fichier = fopen( FICHIER_SAUVEGARDE, "r" ) ) == NULL ) {
-            fprintf( stderr, "Impossible de lire le fichier demandé.\n" );
+            fprintf( stderr, "Aucune sauvegarde trouvée\n\n" );
          } else { 
             plateau = lit_partie_sauvegardee( taille_plateau, nb_joue, nb_touche, nb_cases_navire, fichier );
             est_valide = 1;
