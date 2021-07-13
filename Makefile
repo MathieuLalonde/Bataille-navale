@@ -11,4 +11,4 @@ deluxe: batnav.c
 .PHONY: clean
 
 clean:
-	rm -f motcabatnavche
+	rm -f batnav
