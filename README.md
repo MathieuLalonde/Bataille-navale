@@ -1,5 +1,5 @@
-# INF3135: TP3 - Été 2021
-Dans ce dépôt, vous retrouverez le codes en langage C pour le TP3 d'INF3135.
+# Bataille navale
+Dans ce dépôt, vous retrouverez le codes en langage C pour le TP3.
 
 Ce logiciel est un jeu de bataille navale. 
 
